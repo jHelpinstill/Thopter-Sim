@@ -4,14 +4,14 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = Main.o Airfoil.o
-LINKOBJ  = Main.o Airfoil.o
-LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -mconsole
+OBJ      = Main.o Airfoil.o Blade.o
+LINKOBJ  = Main.o Airfoil.o Blade.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -lgdi32 -mconsole
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
 BIN      = Thopter_wing_sim.exe
-CXXFLAGS = $(CXXINCS) -std=c++14
-CFLAGS   = $(INCS) -std=c++14
+CXXFLAGS = $(CXXINCS) -std=c++11
+CFLAGS   = $(INCS) -std=c++11
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom
@@ -29,3 +29,6 @@ Main.o: Main.cpp
 
 Airfoil.o: Airfoil.cpp
 	$(CPP) -c Airfoil.cpp -o Airfoil.o $(CXXFLAGS)
+
+Blade.o: Blade.cpp
+	$(CPP) -c Blade.cpp -o Blade.o $(CXXFLAGS)
