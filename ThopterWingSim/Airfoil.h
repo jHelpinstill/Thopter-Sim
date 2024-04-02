@@ -15,6 +15,7 @@ private:
 		double alpha;
 		double cl;
 		double cd;
+		DataPoint() : alpha(0), cl(0), cd(0){}
 	};
 	
 	std::vector<DataPoint> data;

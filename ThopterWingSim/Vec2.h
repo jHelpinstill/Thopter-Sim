@@ -10,7 +10,7 @@ struct Vec2
 		struct { double x, y; };
 		double n[2];
 	};
-	Vec2(){}
+	Vec2() : x(0), y(0) {}
 	Vec2(double x, double y) : x(x), y(y) {}
 	Vec2 operator+(Vec2 u) { return Vec2(x + u.x, y + u.y);}
 	Vec2 operator-(Vec2 u) { return Vec2(x - u.x, y - u.y);}

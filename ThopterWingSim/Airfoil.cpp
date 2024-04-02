@@ -34,6 +34,7 @@ Airfoil::DataPoint Airfoil::interp(double alpha) // assumes all alphas are bound
 	dp.alpha = alpha;
 	dp.cl = (1 - t) * data[mid - 1].cl + t * data[mid].cl;
 	dp.cd = (1 - t) * data[mid - 1].cd + t * data[mid].cd;
+	
 	return dp;
 }
 
