@@ -3,8 +3,9 @@
 #include "Airfoil.h"
 #include "Vec2.h"
 
-const double pi_over_180 = 3.14159265 / 180;
-const double two_pi = 3.14159265 * 2;
+const double pi = 3.14159265;
+const double pi_over_180 = pi / 180;
+const double two_pi = pi * 2;
 
 struct WingElement
 {
@@ -52,9 +53,7 @@ private:
 	
 	double span;
 	double chord;
-	
-	double t = 0;
-	
+
 	double sum_impulse = 0;
 	double sum_angular_impulse = 0;
 	
@@ -62,7 +61,9 @@ public:
 	Blade(){}
 	Blade(double span, double chord, Airfoil* af, int num_elems);
 	
-	// swing attributes;
+	double t = 0;
+	
+	// swing attributes (deg, deg, Hz);
 	double amplitude;
 	double collective;
 	double freq;
@@ -91,22 +92,24 @@ Blade::Blade(double span, double chord, Airfoil* af, int num_elems) : span(span)
 
 void Blade::update(Vec2 airflow, double air_dens, double dt)
 {
-	t += dt;
+	airflow = airflow + Vec2(0, sqrt(2 * getAvgThrust() / (air_dens * (pi * span * span * amplitude / 360)))); // steal thrust momentum from airflow
 	
 	thrust = 0;
 	torque = 0;
+	t += dt;
 	
 	double w = freq * two_pi;
 	double twist = collective * cos(w * t);	// degrees
 	double angular_vel = -amplitude * pi_over_180 * w * cos(w * t);	// rads
 	for(int i = 0; i < num_elems; i++)
 	{
+		double radius = span * (1 - (double)i / num_elems);
 		elems[i].angle = twist;
-		elems[i].vel = Vec2(angular_vel * span * (1 - (double)i / num_elems), 0);
+		elems[i].vel = Vec2(angular_vel * radius, 0);
 		elems[i].calculateForces(airflow, air_dens);
 		
 		thrust += elems[i].force.y;
-		torque += elems[i].force.x;
+		torque += elems[i].force.x * radius;
 	}
 	
 	sum_impulse += thrust * dt;
@@ -133,27 +136,22 @@ int main()
 	Airfoil NACA_0012;
 	NACA_0012.attachData("airfoil_NACA_0012.txt");
 	
-	WingElement e;
-	e.airfoil = &NACA_0012;
-	e.chord = 1;
-	e.span = 0.1;
+	Blade blade(6, 0.3, &NACA_0012, 20);
+	blade.amplitude = 25;
+	blade.collective = 15;
+	blade.freq = 20;
 	
-	for(int i = 0; i < 100; i++)
+	for(int i = 0; i < 1000; i++)
 	{
-		e.calculateForces(Vec2(-100, 0), 1.225);
-		
-		std::cout << "lift:\t" << e.lift << std::endl;
-		std::cout << "drag:\t" << e.drag << std::endl;
-		std::cout << "cl:\t" << e.cl << std::endl;
-		std::cout << "cd:\t" << e.cd << std::endl;
-		std::cout << "cl/cd:\t" << e.cl / e.cd<< std::endl;
-		std::cout << "aoa:\t" << e.aoa << std::endl;
-		std::cout << "angle:\t" << e.angle << std::endl;
-		std::cout << "force vec:\t" << e.force.x << ", " << e.force.y << std::endl;
-		
-		e.angle += 0.5;
+		blade.update(Vec2(0, 0), 1.225, 0.001);
+		std::cout << "t: " << blade.t;
+		std::cout << "\tthrust: " << blade.thrust;
+		std::cout << "\ttorque: " << blade.torque;
 		std::cout << std::endl;
 	}
+	
+	std::cout << "avg thrust: " << blade.getAvgThrust() << std::endl;
+	std::cout << "avg torque: " << blade.getRMSTorque() << std::endl;
 	
 //	WingElement element[10];
 //	for(int i = 0; i < 10; i++)
