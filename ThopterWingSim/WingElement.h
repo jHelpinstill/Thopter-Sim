@@ -2,6 +2,7 @@
 #define WING_ELEMENT
 
 #include <cmath>
+#include <iostream>
 #include "Vec2.h"
 #include "Airfoil.h"
 #include "PiConsts.h"
@@ -25,6 +26,7 @@ struct WingElement
 	double angle = 0;
 	void calculateForces(Vec2 airflow, double air_dens)
 	{
+//		std::cout << "elem airflow: " << airflow.x << ' ' << airflow.y << std::endl;
 		const double rads = angle * pi_over_180;
 		
 		Vec2 motion_rel = (vel - airflow).rotate(-rads);

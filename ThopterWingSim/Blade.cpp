@@ -1,8 +1,14 @@
 #include "Blade.h"
 #include "PiConsts.h"
 
-Blade::Blade(double span, double chord, Airfoil* af, int num_elems, double amplitude) : span(span), chord(chord), num_elems(num_elems), amplitude(amplitude)
+Blade::Blade(double span, double chord_root, double chord_tip, Airfoil* af, int num_elems, double amplitude)
 {
+	this->span = span;
+	this->chord_root = chord_root;
+	this->chord_tip = chord_tip;
+	this->num_elems = num_elems;
+	this->amplitude = amplitude;
+	
 	elems = new WingElement[num_elems];
 	regions = new SweptRegion*[num_elems];
 	for(int i = 0; i < num_elems; i++)
@@ -10,7 +16,8 @@ Blade::Blade(double span, double chord, Airfoil* af, int num_elems, double ampli
 		regions[i] = new SweptRegion[regions_per_elem];
 		
 		elems[i].airfoil = af;
-		elems[i].chord = chord;
+		double chord_ratio = (double)i / num_elems;
+		elems[i].chord = (1 - chord_ratio) * chord_root + chord_ratio * chord_tip;
 		elems[i].span = span / num_elems;
 //		std::cout << i << ' ' << elems[i].chord << ' ' << elems[i].span << std::endl;
 		for(int r = 0; r < regions_per_elem; r++)
@@ -54,13 +61,24 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 	
 	double position = 0.5 * (sin(w * t) + 1);
 	double s = (position * (double)regions_per_elem);
-	int airflow_region = int(s - 0.5);
+	int airflow_region = (int)(s - 0.5);
 	
 	bool under = (s < 0.5);
-	bool over = (s >= regions_per_elem + 0.5);
+	bool over = (s >= (regions_per_elem - 1 + 0.5));
 	if(!under)
 		s -= airflow_region;
 	s -= 0.5;
+	
+//	std::cout << "\n///// BLADE UPDATE: s = " << s << "\tairflow region: " << airflow_region << "\tstate: ";
+//	if(under) std::cout << "under" << std::endl;
+//	else if(over) std::cout << "over" << std::endl;
+//	else std::cout << "normal" << std::endl;
+	
+	if(print_elems)
+	{
+		printRegions();
+		printElems();
+	}
 	
 	double angular_vel = amplitude * pi_over_180 * w * cos(w * t);	// rads
 	for(int i = 0; i < num_elems; i++)
@@ -92,15 +110,10 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		torque += elems[i].force.x * radius;
 	}
 	
-	if(print_elems)
-	{
-//		printRegions();
-		printElems();
-		std::cout << "total blade thrust: " << thrust << "\ttotal blade torque: " << torque << std::endl;
-	}
+	if(print_elems) std::cout << "total blade thrust: " << thrust << "\ttotal blade torque: " << torque << "\tinstantaneous power: " << torque * w << "W, " << torque * w / 746 << "hp" << std::endl;
 	
 	sum_impulse += thrust * dt;
-	sum_energy_squared += torque * torque * w * w * dt;
+	sum_energy_squared += torque * w * dt;
 }
 
 double Blade::getAvgThrust()
@@ -112,7 +125,29 @@ double Blade::getAvgThrust()
 
 double Blade::getRMSPower()
 {
-	return sqrt(sum_energy_squared / t);
+	return sum_energy_squared / t;
+}
+
+void Blade::printDebug()
+{
+	std::cout << "Blade debug info: " << std::endl;
+	std::cout << "num_elems: " << num_elems;
+	std::cout << "\tregions_per_elem " << regions_per_elem;
+	std::cout << "\tspan: " << span;
+	std::cout << "\tchord_root: " << chord_root;
+	std::cout << "\tchord_tip: " << chord_tip;
+	std::cout << "\tsum_immpulse: " << sum_impulse;
+	std::cout << "\tsum_energy_squared: " << sum_energy_squared;
+	
+	std::cout << "\tt: " << t;
+	
+	// swing attributes (deg, deg, Hz);
+	std::cout << "\tamplitude: " << amplitude;
+	std::cout << "\tcollective: " << collective;
+	std::cout << "\tfreq: " << freq;
+	
+	std::cout << "\tthrust: " << thrust;
+	std::cout << "\ttorque: " << torque;
 }
 
 //double Blade::getAvgPropWash()

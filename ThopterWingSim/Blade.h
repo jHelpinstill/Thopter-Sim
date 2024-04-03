@@ -13,14 +13,15 @@ private:
 	int regions_per_elem = 8;
 	
 	double span = 0;
-	double chord = 0;
+	double chord_root = 0;
+	double chord_tip = 0;
 
 	double sum_impulse = 0;
 	double sum_energy_squared = 0;
 	
 public:
 	Blade(){}
-	Blade(double span, double chord, Airfoil* af, int num_elems, double amplitude);
+	Blade(double span, double chord_root, double chord_tip, Airfoil* af, int num_elems, double amplitude);
 	
 	double t = 0;
 	
@@ -40,6 +41,7 @@ public:
 	
 	void printElems();
 	void printRegions();
+	void printDebug();
 	
 	~Blade();
 };
