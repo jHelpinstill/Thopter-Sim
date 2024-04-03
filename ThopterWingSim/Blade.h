@@ -15,6 +15,7 @@ private:
 	double span = 0;
 	double chord_root = 0;
 	double chord_tip = 0;
+	double mass = 10;
 
 	double sum_impulse = 0;
 	double sum_energy_squared = 0;
@@ -34,6 +35,11 @@ public:
 	
 	double thrust = 0;
 	double torque = 0;
+	double torque_AC = 0;
+	
+	double peak_torque = 0;
+	double peak_torque_AC = 0;
+	double peak_lift_moment = 0;
 	
 	double getAvgThrust();
 	double getRMSPower();

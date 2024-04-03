@@ -6,16 +6,18 @@
 
 void testFrequencies(Airfoil* airfoil)
 {
-	for(int f = 1; f < 30; f++)
+	for(int f = 1; f < 16; f++)
 	{
 		double max_ratio = 0;
 		double collective_at_max = 0;
 		double thrust_at_max = 0;
 		double power_at_max = 0;
 		double prop_wash_at_max = 0;
+		double peak_torque_AC = 0;
+		double peak_lift_moment = 0;
 		for(int c = -10; c < 45; c++)
 		{
-			Blade blade(6, 1, 0.3, airfoil, 20, 45);
+			Blade blade(6, 0.6, 0.3, airfoil, 20, 45);
 //			blade.amplitude = 25;
 			blade.collective = c;
 			blade.freq = f;
@@ -32,6 +34,8 @@ void testFrequencies(Airfoil* airfoil)
 				collective_at_max = blade.collective;
 				thrust_at_max = blade.getAvgThrust();
 				power_at_max = blade.getRMSPower();
+				peak_torque_AC = blade.peak_torque_AC;
+				peak_lift_moment = blade.peak_lift_moment;
 //				prop_wash_at_max = blade.getAvgPropWash();	
 			}
 		}
@@ -41,6 +45,8 @@ void testFrequencies(Airfoil* airfoil)
 		std::cout << "avg power: " << power_at_max << std::endl;
 		std::cout << "N/w: " << max_ratio << std::endl;
 		std::cout << "lbs/hp: " << max_ratio * (746 / 4.4444) << std::endl;
+		std::cout << "peak blade sweep-wise torque: " << peak_torque_AC << std::endl;
+		std::cout << "peak blade lift moment: " << peak_lift_moment << std::endl;
 //		std::cout << "prop wash: " << prop_wash_at_max << std::endl;
 	}
 }

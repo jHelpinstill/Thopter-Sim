@@ -11,6 +11,7 @@ Blade::Blade(double span, double chord_root, double chord_tip, Airfoil* af, int 
 	
 	elems = new WingElement[num_elems];
 	regions = new SweptRegion*[num_elems];
+	double mass_area_density = mass / ((chord_root + chord_tip) * span / 2);
 	for(int i = 0; i < num_elems; i++)
 	{
 		regions[i] = new SweptRegion[regions_per_elem];
@@ -19,6 +20,8 @@ Blade::Blade(double span, double chord_root, double chord_tip, Airfoil* af, int 
 		double chord_ratio = (double)i / num_elems;
 		elems[i].chord = (1 - chord_ratio) * chord_root + chord_ratio * chord_tip;
 		elems[i].span = span / num_elems;
+		elems[i].mass = elems[i].chord * elems[i].span * mass_area_density;
+		
 //		std::cout << i << ' ' << elems[i].chord << ' ' << elems[i].span << std::endl;
 		for(int r = 0; r < regions_per_elem; r++)
 			regions[i][r].area = (elems[i].span * (span * ((double)i + 0.5) / num_elems) * amplitude * pi_over_180) / regions_per_elem;
@@ -54,6 +57,8 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 //	std::cout << "getavgthr: " << getAvgThrust() << std::endl;
 	thrust = 0;
 	torque = 0;
+	torque_AC = 0;
+	double lift_moment = 0;
 	t += dt;
 	
 	double w = freq * two_pi;
@@ -80,7 +85,8 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		printElems();
 	}
 	
-	double angular_vel = amplitude * pi_over_180 * w * cos(w * t);	// rads
+	double angular_vel = amplitude * pi_over_180 * w * cos(w * t);	// rads / s
+	double angular_accel = amplitude * pi_over_180 * w * w * -sin(w * t); // rads / s^2
 	for(int i = 0; i < num_elems; i++)
 	{
 		double radius = span * (double)i / num_elems;
@@ -108,10 +114,17 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		}
 		thrust += elems[i].force.y;
 		torque += elems[i].force.x * radius;
+		lift_moment += elems[i].force.y * radius;
+		torque_AC += elems[i].mass * radius * angular_accel;
 	}
 	
 	if(print_elems) std::cout << "total blade thrust: " << thrust << "\ttotal blade torque: " << torque << "\tinstantaneous power: " << torque * w << "W, " << torque * w / 746 << "hp" << std::endl;
-	
+	if(torque > peak_torque)
+		peak_torque = torque;
+	if(lift_moment > peak_lift_moment)
+		peak_lift_moment = lift_moment;
+	if(torque_AC > peak_torque_AC)
+		peak_torque_AC = torque_AC;
 	sum_impulse += thrust * dt;
 	sum_energy_squared += torque * w * dt;
 }

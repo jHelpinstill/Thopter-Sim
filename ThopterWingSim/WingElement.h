@@ -16,12 +16,14 @@ struct WingElement
 		drag(0),
 		aoa(0),
 		cl(0),
-		cd(0)
+		cd(0),
+		mass(0)
 	{}
 	Airfoil* airfoil;
 	
 	double chord;
 	double span;
+	double mass;
 	Vec2 vel;
 	double angle = 0;
 	void calculateForces(Vec2 airflow, double air_dens)
