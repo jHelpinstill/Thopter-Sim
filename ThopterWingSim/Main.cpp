@@ -15,9 +15,9 @@ void testFrequencies(Airfoil* airfoil)
 		double prop_wash_at_max = 0;
 		double peak_torque_AC = 0;
 		double peak_lift_moment = 0;
-		for(int c = -10; c < 45; c++)
+		for(int c = 1; c < 45; c++)
 		{
-			Blade blade(6, 0.6, 0.3, airfoil, 20, 45);
+			Blade blade(6, 0.6, 0.3, airfoil, 20, 22.5);
 //			blade.amplitude = 25;
 			blade.collective = c;
 			blade.freq = f;
@@ -42,7 +42,7 @@ void testFrequencies(Airfoil* airfoil)
 		std::cout << "\nmax values at freq " << f << "Hz: " << std::endl;
 		std::cout << "collective: " << collective_at_max << std::endl;
 		std::cout << "avg thrust: " << thrust_at_max << std::endl;
-		std::cout << "avg power: " << power_at_max << std::endl;
+		std::cout << "avg power: " << power_at_max << "W, " << power_at_max / 746 << "hp" << std::endl;
 		std::cout << "N/w: " << max_ratio << std::endl;
 		std::cout << "lbs/hp: " << max_ratio * (746 / 4.4444) << std::endl;
 		std::cout << "peak blade sweep-wise torque: " << peak_torque_AC << std::endl;
@@ -132,7 +132,7 @@ int main()
 //
 //	for(int i = 0; i < 200; i++)
 //	{
-//		blade.update(Vec2(0, 0), 1.225, 1 / (100.0 * blade.freq), true);
+//		blade.update(Vec2(-75, 0), 1.225, 1 / (100.0 * blade.freq), true);
 //	}
 //	
 //	std::cout << "\nmax values at freq " << blade.freq << "Hz: " << std::endl;
