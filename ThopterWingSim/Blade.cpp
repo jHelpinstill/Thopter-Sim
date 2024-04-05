@@ -1,11 +1,12 @@
 #include "Blade.h"
 #include "PiConsts.h"
 
-Blade::Blade(double span, double chord_root, double chord_tip, Airfoil* af, int num_elems, double amplitude)
+Blade::Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude)
 {
 	this->span = span;
 	this->chord_root = chord_root;
 	this->chord_tip = chord_tip;
+	this->mass = mass;
 	this->num_elems = num_elems;
 	this->amplitude = amplitude;
 	
@@ -126,7 +127,7 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 	if(torque_AC > peak_torque_AC)
 		peak_torque_AC = torque_AC;
 	sum_impulse += thrust * dt;
-	sum_energy_squared += torque * w * dt;
+	sum_energy += torque * w * dt;
 }
 
 double Blade::getAvgThrust()
@@ -136,9 +137,9 @@ double Blade::getAvgThrust()
 	return sum_impulse / t;
 }
 
-double Blade::getRMSPower()
+double Blade::getAvgPower()
 {
-	return sum_energy_squared / t;
+	return sum_energy / t;
 }
 
 void Blade::printDebug()
@@ -150,7 +151,7 @@ void Blade::printDebug()
 	std::cout << "\tchord_root: " << chord_root;
 	std::cout << "\tchord_tip: " << chord_tip;
 	std::cout << "\tsum_immpulse: " << sum_impulse;
-	std::cout << "\tsum_energy_squared: " << sum_energy_squared;
+	std::cout << "\tsum_energy: " << sum_energy;
 	
 	std::cout << "\tt: " << t;
 	
@@ -163,17 +164,20 @@ void Blade::printDebug()
 	std::cout << "\ttorque: " << torque;
 }
 
-//double Blade::getAvgPropWash()
-//{
-//	double total_area = 0;
-//	double sum = 0;
-//	for(int i = 0; i < num_elems; i++)
-//	{
-//		total_area += regions[i].area;
-//		sum += regions[i].wash * regions[i].area;
-//	}
-//	return 2 * sum / total_area;
-//}
+void Blade::reset()
+{
+	t = 0;
+	sum_impulse = 0;
+	sum_energy = 0;
+	
+	thrust = 0;
+	torque = 0;
+	torque_AC = 0;
+	
+	peak_torque = 0;
+	peak_torque_AC = 0;
+	peak_lift_moment = 0;
+}
 
 Blade::~Blade()
 {

@@ -6,7 +6,7 @@
 
 void testFrequencies(Airfoil* airfoil)
 {
-	for(int f = 1; f < 16; f++)
+	for(int f = 1; f < 31; f++)
 	{
 		double max_ratio = 0;
 		double collective_at_max = 0;
@@ -17,7 +17,7 @@ void testFrequencies(Airfoil* airfoil)
 		double peak_lift_moment = 0;
 		for(int c = 1; c < 45; c++)
 		{
-			Blade blade(6, 0.6, 0.3, airfoil, 20, 22.5);
+			Blade blade(1, 0.1, 0.05, 10.0 / 216, airfoil, 20, 22.5);
 //			blade.amplitude = 25;
 			blade.collective = c;
 			blade.freq = f;
@@ -26,14 +26,14 @@ void testFrequencies(Airfoil* airfoil)
 				blade.update(Vec2(0, 0), 1.225, 1 / (100.0 * f));
 			}
 			
-			double ratio = blade.getAvgThrust() / blade.getRMSPower();
+			double ratio = blade.getAvgThrust() / blade.getAvgPower();
 			
 			if(ratio > max_ratio)
 			{
 				max_ratio = ratio;
 				collective_at_max = blade.collective;
 				thrust_at_max = blade.getAvgThrust();
-				power_at_max = blade.getRMSPower();
+				power_at_max = blade.getAvgPower();
 				peak_torque_AC = blade.peak_torque_AC;
 				peak_lift_moment = blade.peak_lift_moment;
 //				prop_wash_at_max = blade.getAvgPropWash();	
@@ -44,6 +44,7 @@ void testFrequencies(Airfoil* airfoil)
 		std::cout << "avg thrust: " << thrust_at_max << std::endl;
 		std::cout << "avg power: " << power_at_max << "W, " << power_at_max / 746 << "hp" << std::endl;
 		std::cout << "N/w: " << max_ratio << std::endl;
+		std::cout << "g/w: " << max_ratio * (1000 / 9.8) << std::endl;
 		std::cout << "lbs/hp: " << max_ratio * (746 / 4.4444) << std::endl;
 		std::cout << "peak blade sweep-wise torque: " << peak_torque_AC << std::endl;
 		std::cout << "peak blade lift moment: " << peak_lift_moment << std::endl;
@@ -62,7 +63,7 @@ void testChords(Airfoil* airfoil)
 		double prop_wash_at_max = 0;
 		for(int c = 1; c < 45; c++)
 		{
-			Blade blade(6, cr, ct, airfoil, 20, 25);
+			Blade blade(6, cr, ct, 10, airfoil, 20, 25);
 //			blade.amplitude = 25;
 			blade.collective = c;
 			blade.freq = 8;
@@ -71,14 +72,14 @@ void testChords(Airfoil* airfoil)
 				blade.update(Vec2(0, 0), 1.225, 1 / (100.0 * blade.freq));
 			}
 			
-			double ratio = blade.getAvgThrust() / blade.getRMSPower();
+			double ratio = blade.getAvgThrust() / blade.getAvgPower();
 			
 			if(ratio > max_ratio)
 			{
 				max_ratio = ratio;
 				collective_at_max = blade.collective;
 				thrust_at_max = blade.getAvgThrust();
-				power_at_max = blade.getRMSPower();
+				power_at_max = blade.getAvgPower();
 //				prop_wash_at_max = blade.getAvgPropWash();	
 			}
 		}
@@ -102,7 +103,7 @@ int main()
 	
 //	for(int c = -5; c < 50; c++)
 //	{
-//		Blade blade(6, 1, 0.5, &NACA_0012, 20, 25);
+//		Blade blade(6, 1, 0.5, 10, &NACA_0012, 20, 25);
 ////		blade.amplitude = 25;
 //		blade.collective = c;
 //		blade.freq = 8;	
@@ -118,14 +119,14 @@ int main()
 //		std::cout << "\nmax values at freq " << blade.freq << "Hz: " << std::endl;
 //		std::cout << "collective: " << blade.collective << std::endl;
 //		std::cout << "avg thrust: " << blade.getAvgThrust() << std::endl;
-//		std::cout << "avg power: " << blade.getRMSPower() << std::endl;
-//		double ratio = blade.getAvgThrust() / blade.getRMSPower();
+//		std::cout << "avg power: " << blade.getAvgPower() << std::endl;
+//		double ratio = blade.getAvgThrust() / blade.getAvgPower();
 //		std::cout << "N/w: " << ratio << std::endl;
 //		std::cout << "lbs/hp: " << ratio * (746 / 4.4444) << std::endl;
 ////		std::cout << "prop wash: " << blade.disk_air_flow * 2 << std::endl;
 //	}
 
-//	Blade blade(6, 0.3, 0.1, &NACA_0012, 20, 25);
+//	Blade blade(6, 0.3, 0.1, 10, &NACA_0012, 20, 25);
 ////	blade.amplitude = 25;
 //	blade.collective = 17;
 //	blade.freq = 8;	
@@ -138,8 +139,8 @@ int main()
 //	std::cout << "\nmax values at freq " << blade.freq << "Hz: " << std::endl;
 //	std::cout << "collective: " << blade.collective << std::endl;
 //	std::cout << "avg thrust: " << blade.getAvgThrust() << std::endl;
-//	std::cout << "avg power: " << blade.getRMSPower() << "W, " << blade.getRMSPower() / 746 << "hp" << std::endl;
-//	double ratio = blade.getAvgThrust() / blade.getRMSPower();
+//	std::cout << "avg power: " << blade.getAvgPower() << "W, " << blade.getAvgPower() / 746 << "hp" << std::endl;
+//	double ratio = blade.getAvgThrust() / blade.getAvgPower();
 //	std::cout << "N/w: " << ratio << std::endl;
 //	std::cout << "lbs/hp: " << ratio * (746 / 4.4444) << std::endl;
 //	

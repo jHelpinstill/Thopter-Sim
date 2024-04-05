@@ -15,14 +15,14 @@ private:
 	double span = 0;
 	double chord_root = 0;
 	double chord_tip = 0;
-	double mass = 10;
+	double mass = 0;
 
 	double sum_impulse = 0;
-	double sum_energy_squared = 0;
+	double sum_energy = 0;
 	
 public:
 	Blade(){}
-	Blade(double span, double chord_root, double chord_tip, Airfoil* af, int num_elems, double amplitude);
+	Blade(double span, double chord_root, double mass, double chord_tip, Airfoil* af, int num_elems, double amplitude);
 	
 	double t = 0;
 	
@@ -30,6 +30,7 @@ public:
 	double amplitude = 0;
 	double collective = 0;
 	double freq = 0;
+	double sweep_plane_angle = 0;
 	
 	void update(Vec2 airflow, double air_dens, double dt, bool print_elems = false);
 	
@@ -42,12 +43,13 @@ public:
 	double peak_lift_moment = 0;
 	
 	double getAvgThrust();
-	double getRMSPower();
-	double getAvgPropWash();
+	double getAvgPower();
 	
 	void printElems();
 	void printRegions();
 	void printDebug();
+	
+	void reset();
 	
 	~Blade();
 };
