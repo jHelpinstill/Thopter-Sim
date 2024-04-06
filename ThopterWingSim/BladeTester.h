@@ -17,8 +17,9 @@ public:
 	BladeTester(){}
 	BladeTester(Blade* blade, double* test_param, double lower, double higher, int num_divisions);
 	
+	void attachBlade(Blade* blade);
 	void runTest(double num_periods, double iterations_per_period);
-	void setTestParameter(double* test_param, double lower, double higher, int num_divisions);
+	void setTestParameters(double* test_param, double lower, double higher, int num_divisions);
 };
 
 #endif

@@ -2,8 +2,8 @@
 
 BladeTester::BladeTester(Blade* blade, double* test_param, double lower, double higher, int num_divisions)
 {
-	this->blade = blade;
-	setTestParameter(test_param, lower, higher, num_divisions);
+	attachBlade(blade);
+	setTestParameters(test_param, lower, higher, num_divisions);
 }
 void BladeTester::runTest(double num_periods, double iterations_per_period)
 {
@@ -15,9 +15,10 @@ void BladeTester::runTest(double num_periods, double iterations_per_period)
 		double period = 1 / blade->freq;
 		double dt = period / iterations_per_period;
 		int iterations = iterations_per_period * num_periods;
+		std::cout << "iterations: " << iterations << "\tperiod: " << period << "\tdt: " << dt << std::endl;
 		for(int i = 0; i < iterations; i++)
 		{
-			blade->update(Vec2(-75, 0), 1.225, dt);
+			blade->update(Vec2(0, 0), 1.225, dt);
 		}
 		
 		std::cout << "Test results: " << std::endl;
@@ -32,7 +33,12 @@ void BladeTester::runTest(double num_periods, double iterations_per_period)
 		*test_param += increment;
 	}
 }
-void BladeTester::setTestParameter(double* test_param, double lower, double higher, int num_divisions)
+
+void BladeTester::attachBlade(Blade* blade)
+{
+	this->blade = blade;
+}
+void BladeTester::setTestParameters(double* test_param, double lower, double higher, int num_divisions)
 {
 	this->test_param = test_param;
 	this->lower = lower;

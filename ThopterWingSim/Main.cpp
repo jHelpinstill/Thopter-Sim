@@ -3,6 +3,7 @@
 #include "Airfoil.h"
 #include "Blade.h"
 #include "Vec2.h"
+#include "BladeTester.h"
 
 void testFrequencies(Airfoil* airfoil)
 {
@@ -98,7 +99,17 @@ int main()
 	Airfoil NACA_0012;
 	NACA_0012.attachData("airfoil_NACA_0012.txt");
 	
-	testFrequencies(&NACA_0012);
+	BladeTester tester;
+	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
+	blade.collective = 22;
+	
+	tester.attachBlade(&blade);
+	tester.setTestParameters(&blade.freq, 20, 21, 1);
+	
+	tester.runTest(4, 100);
+	
+	
+//	testFrequencies(&NACA_0012);
 //	testChords(&NACA_0012);
 	
 //	for(int c = -5; c < 50; c++)

@@ -22,7 +22,7 @@ private:
 	
 public:
 	Blade(){}
-	Blade(double span, double chord_root, double mass, double chord_tip, Airfoil* af, int num_elems, double amplitude);
+	Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude);
 	
 	double t = 0;
 	
