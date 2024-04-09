@@ -24,11 +24,14 @@ private:
 
 public:
 	Airfoil(){}
+	Airfoil(std::string name) : name(name) {}
+	
+	std::string name = "";
 	
 	double getCl(double alpha);
 	double getCd(double alpha);
 	
-	void attachData(std::string file_name, bool print = false);
+	bool attachData(std::string file_name, bool print = false);
 	void printData();
 };
 

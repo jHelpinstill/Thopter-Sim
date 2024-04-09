@@ -1,7 +1,7 @@
 #include "Blade.h"
 #include "PiConsts.h"
 
-Blade::Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude)
+Blade::Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude) : Blade()
 {
 	this->span = span;
 	this->chord_root = chord_root;
@@ -164,6 +164,32 @@ void Blade::printDebug()
 	std::cout << "\ttorque: " << torque;
 }
 
+void Blade::printInfo(bool verbose)
+{
+	std::cout << "Blade ID: " << ID << 
+	"\nDimensions:\n  span: " << span <<
+	"\n  chord root:\t" << chord_root << 
+	"\n  chord tip:\t" << chord_tip << 
+	"\n  mass:\t" << mass;
+	
+	if(verbose)
+	{
+		std::cout << "Other info: " <<
+		"num_elems: " << num_elems <<
+		"\tregions_per_elem " << regions_per_elem <<
+		"\tspan: " << span <<
+		"\tchord_root: " << chord_root <<
+		"\tchord_tip: " << chord_tip <<
+		"\tsum_immpulse: " << sum_impulse <<
+		"\tsum_energy: " << sum_energy <<
+		"\tamplitude: " << amplitude <<
+		"\tcollective: " << collective <<
+		"\tfreq: " << freq;
+	}
+	
+	std::cout << std::endl;
+}
+
 void Blade::reset()
 {
 	t = 0;
@@ -185,3 +211,5 @@ Blade::~Blade()
 	for(int i = 0; i < num_elems; i++)
 		delete[] regions[i];
 }
+
+int Blade::next_ID = 0;

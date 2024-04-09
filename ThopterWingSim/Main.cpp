@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 #include "Airfoil.h"
 #include "Blade.h"
 #include "Vec2.h"
@@ -94,19 +95,171 @@ void testChords(Airfoil* airfoil)
 	}
 }
 
+std::vector<Blade*> saved_blades;
+std::vector<Airfoil*> airfoils;
+
+void addAirfoil()
+{
+	std::string name;
+	std::cout << "\nEnter airfoil name: ";
+	std::cin.ignore(1,'\n'); std::getline(std::cin, name);
+	
+	Airfoil* af = new Airfoil(name);
+	bool checking_file = true;
+	while(checking_file)
+	{
+		std::string fn;
+		std::cout << "Enter file name: ";
+		std::getline(std::cin, fn);
+		if(!af->attachData(fn))
+		{
+			std::cout << "  file not found! ";
+		}
+		else
+			checking_file = false;
+	}
+	airfoils.push_back(af);
+	std::cout << "  Airfoil " << af->name << " saved!\n" << std::endl;	
+}
+bool airfoilSelector(Airfoil* af)
+{
+	if(!airfoils.size())
+	{
+		std::cout << "  There are no stored airfoils" << std::endl;
+		return false;
+	}
+	std::cout << "Select an airfoil: " << std::endl;
+	for(int i = 0; i < airfoils.size(); i++)
+	{
+		std::cout << "  " << i << ": " << airfoils[i]->name << std::endl;
+	}
+	int input; std::cin >> input;
+	while(input < 0 || input >= airfoils.size())
+	{
+		std::cout << "invalid selection, try again: ";
+		std::cin >> input;
+	}
+	af = airfoils[input];
+	return true;
+}
+void airfoilLoop()
+{
+	char input;
+	std::cout << "\nView saved airfoils (v), add new airfoil (a)... ";
+	std::cin >> input;
+	switch(input)
+	{
+		case 'v':
+		{
+			if(!airfoils.size())
+			{
+				std::cout << "There are no saved airfoils to view." << std::endl;
+				break;
+			}
+			else
+			{
+				for(int i = 0; i < airfoils.size(); i++)
+				{
+					std::cout << "  " << i << ": " << airfoils[i]->name << std::endl;
+				}
+			}
+			break;
+		}
+		case 'a':
+		{
+			addAirfoil();
+			break;
+		}
+	}
+}
+void bladeLoop()
+{
+	char input;
+	std::cout << "\nView saved blades (v), create new blade (c)... ";
+	std::cin >> input;
+	switch(input)
+	{
+		/// View stored blades
+		case 'v':
+		{
+			if(!saved_blades.size())
+			{
+				std::cout << "There are no saved blades to view." << std::endl;
+				break;
+			}
+			else
+			{
+				for(int i = 0; i < saved_blades.size(); i++)
+				{
+					saved_blades[i]->printInfo();
+				}
+			}
+			break;
+		}
+		
+		/// Create new blade
+		case 'c':
+		{
+			double span, cr, ct, mass, amp;
+			int num_elems;
+			Airfoil* af;
+			std::cout << "\n///// Blade Creator /////" << std::endl;
+			std::cout << "  span: "; std::cin >> span;
+			std::cout << "  root chord: "; std::cin >> cr;
+			std::cout << "  tip chord: "; std::cin >> ct;
+			std::cout << "  mass: "; std::cin >> mass;
+			std::cout << "  swing angle: "; std::cin >> amp; amp /= 2;
+			std::cout << "  number of wing elements: "; std::cin >> num_elems;
+			if(!airfoilSelector(af)) break;
+			
+			saved_blades.push_back(new Blade(span, cr, ct, mass, af, num_elems, amp));
+			std::cout << "Blade Saved!\n" << std::endl;
+			break;
+		}
+	}
+}
+
 int main()
 {	
-	Airfoil NACA_0012;
-	NACA_0012.attachData("airfoil_NACA_0012.txt");
+//	Airfoil NACA_0012;
+//	NACA_0012.attachData("airfoil_NACA_0012.txt");
 	
-	BladeTester tester;
-	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
-	blade.collective = 22;
+	bool running = true;
+	while(running)
+	{
+		char input;
+		std::cout << "Options: blades (b), tests (t), airfoils (a), quit (q)... ";
+		std::cin >> input;
+		switch(input)
+		{
+			case 'b':
+			{
+				bladeLoop();
+				break;
+			}
+			case 'a':
+			{
+				airfoilLoop();
+				break;
+			}
+			case 'q':
+			{
+				std::cout << "\n  Quitting...";
+				running = false;
+				break;
+			}
+		}
+		std::cout << "\n///// Main Menu /////" << std::endl;
+	}
 	
-	tester.attachBlade(&blade);
-	tester.setTestParameters(&blade.freq, 20, 21, 1);
-	
-	tester.runTest(4, 100);
+//	BladeTester tester;
+//	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
+//	blade.collective = 22;
+//	
+//	tester.attachBlade(&blade);
+//	tester.setTestParameters(&blade.freq, 20, 21, 1);
+//	
+//	tester.runTest(4, 100);
 	
 	
 //	testFrequencies(&NACA_0012);

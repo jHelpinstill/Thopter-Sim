@@ -47,46 +47,37 @@ double Airfoil::getCd(double alpha)
 	return interp(alpha).cd;
 }
 
-void Airfoil::attachData(std::string file_name, bool print)
+bool Airfoil::attachData(std::string file_name, bool print)
 {
 	std::ifstream file(file_name);
-	if(file.is_open())
+	if(!file.is_open())
+		return false;
+	
+	std::string line;
+	while(!file.eof())
 	{
-		std::cout << "Airfoil file \"" << file_name << "\" found!" << std::endl;
 		
-		std::string line;
-		while(!file.eof())
-		{
-			
-			std::getline(file, line);
-//			std::cout << "line: " << line << std::endl;
-			std::stringstream ss(line);
-			
-			DataPoint dp;
-			ss >> dp.alpha;
-			ss >> dp.cl;
-			ss >> dp.cd;
-			
-//			std::cout << dp.alpha << '\t' << dp.cl << '\t' << dp.cd << '\t' << std::endl;
+		std::getline(file, line);
+		std::stringstream ss(line);
+		
+		DataPoint dp;
+		ss >> dp.alpha;
+		ss >> dp.cl;
+		ss >> dp.cd;
 
-			if(data.size() && dp.alpha <= data[data.size() - 1].alpha)
-			{
-				break;
-			}
-			data.push_back(dp);
-		}
-		
-		if(print)
+		if(data.size() && dp.alpha <= data[data.size() - 1].alpha)
 		{
-			std::cout << "Data collected: " << std::endl;
-			printData();
+			break;
 		}
+		data.push_back(dp);
 	}
-	else
+	
+	if(print)
 	{
-		std::cout << "Error: airfoil file not found at \"" << file_name << "\"" << std::endl;
-		exit(0);
+		std::cout << "Data collected: " << std::endl;
+		printData();
 	}
+	return true;
 }
 
 void Airfoil::printData()

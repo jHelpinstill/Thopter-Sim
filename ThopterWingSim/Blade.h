@@ -20,8 +20,11 @@ private:
 	double sum_impulse = 0;
 	double sum_energy = 0;
 	
+	int ID;
+	static int next_ID;
+	
 public:
-	Blade(){}
+	Blade() : ID(next_ID++){}
 	Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude);
 	
 	double t = 0;
@@ -48,6 +51,7 @@ public:
 	void printElems();
 	void printRegions();
 	void printDebug();
+	void printInfo(bool verbose = false);
 	
 	void reset();
 	
