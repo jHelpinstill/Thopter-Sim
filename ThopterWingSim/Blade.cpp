@@ -1,15 +1,30 @@
 #include "Blade.h"
 #include "PiConsts.h"
 
-Blade::Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude) : Blade()
+Blade::Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude) :
+	span(span),
+	chord_root(chord_root),
+	chord_tip(chord_tip),
+	mass(mass),
+	num_elems(num_elems),
+	amplitude(amplitude),
+	airfoil(af)
 {
-	this->span = span;
-	this->chord_root = chord_root;
-	this->chord_tip = chord_tip;
-	this->mass = mass;
-	this->num_elems = num_elems;
-	this->amplitude = amplitude;
+	Blade();
+	build();
+}
+
+void Blade::rebuild()
+{
+	delete[] elems;
+	for(int i = 0; i < num_elems; i++)
+		delete[] regions[i];
 	
+	build();
+}
+
+void Blade::build()
+{	
 	elems = new WingElement[num_elems];
 	regions = new SweptRegion*[num_elems];
 	double mass_area_density = mass / ((chord_root + chord_tip) * span / 2);
@@ -17,17 +32,53 @@ Blade::Blade(double span, double chord_root, double chord_tip, double mass, Airf
 	{
 		regions[i] = new SweptRegion[regions_per_elem];
 		
-		elems[i].airfoil = af;
+		elems[i].airfoil = airfoil;
 		double chord_ratio = (double)i / num_elems;
 		elems[i].chord = (1 - chord_ratio) * chord_root + chord_ratio * chord_tip;
 		elems[i].span = span / num_elems;
 		elems[i].mass = elems[i].chord * elems[i].span * mass_area_density;
 		
-//		std::cout << i << ' ' << elems[i].chord << ' ' << elems[i].span << std::endl;
 		for(int r = 0; r < regions_per_elem; r++)
 			regions[i][r].area = (elems[i].span * (span * ((double)i + 0.5) / num_elems) * amplitude * pi_over_180) / regions_per_elem;
 	}
-//	std::cout << "num elems: " << num_elems << std::endl;
+}
+
+void Blade::setSpan(double span)
+{
+	this->span = span;
+	rebuild();
+}
+void Blade::setChordRoot(double chord_root)
+{
+	this->chord_root = chord_root;
+	rebuild();
+}
+void Blade::setChordTip(double chord_tip)
+{
+	this->chord_tip = chord_tip;
+	rebuild();
+}
+void Blade::setMass(double mass)
+{
+	this->mass = mass;
+	rebuild();
+}
+void Blade::setAmplitude(double amplitude)
+{
+	this->amplitude = amplitude;
+	rebuild();
+}
+void Blade::setCollective(double collective)
+{
+	this->collective = collective;
+}
+void Blade::setFreq(double freq)
+{
+	this->freq = freq;
+}
+void Blade::setSweepPlaneAngle(double sweep_plane_angle)
+{
+	this->sweep_plane_angle = sweep_plane_angle;
 }
 
 void Blade::printElems()
@@ -126,8 +177,10 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		peak_lift_moment = lift_moment;
 	if(torque_AC > peak_torque_AC)
 		peak_torque_AC = torque_AC;
+		
 	sum_impulse += thrust * dt;
 	sum_energy += torque * w * dt;
+	specific_power = getAvgThrust() / getAvgPower();
 }
 
 double Blade::getAvgThrust()
@@ -139,6 +192,8 @@ double Blade::getAvgThrust()
 
 double Blade::getAvgPower()
 {
+	if(t == 0)
+		return 0;
 	return sum_energy / t;
 }
 
@@ -170,21 +225,22 @@ void Blade::printInfo(bool verbose)
 	"\nDimensions:\n  span: " << span <<
 	"\n  chord root:\t" << chord_root << 
 	"\n  chord tip:\t" << chord_tip << 
-	"\n  mass:\t" << mass;
+	"\n  mass:\t" << mass <<
+	"\n  avg thrust:\t" << getAvgThrust() <<
+	"\n  avg Power:\t" << getAvgPower() <<
+	"\n  spec power:\t" << specific_power << "N/w, " << specific_power * (1000 / 9.8) << "g/w, " << specific_power * (746 / 4.448) << "lbs/hp";
 	
 	if(verbose)
 	{
-		std::cout << "Other info: " <<
+		std::cout << "\nOther info: " <<
 		"num_elems: " << num_elems <<
-		"\tregions_per_elem " << regions_per_elem <<
-		"\tspan: " << span <<
-		"\tchord_root: " << chord_root <<
-		"\tchord_tip: " << chord_tip <<
-		"\tsum_immpulse: " << sum_impulse <<
-		"\tsum_energy: " << sum_energy <<
-		"\tamplitude: " << amplitude <<
-		"\tcollective: " << collective <<
-		"\tfreq: " << freq;
+		"\nregions_per_elem " << regions_per_elem <<
+		"\nspan: " << span <<
+		"\nchord_root: " << chord_root <<
+		"\nchord_tip: " << chord_tip <<
+		"\namplitude: " << amplitude <<
+		"\ncollective: " << collective <<
+		"\nfreq: " << freq;
 	}
 	
 	std::cout << std::endl;

@@ -12,10 +12,7 @@ private:
 	int num_elems = 0;
 	int regions_per_elem = 8;
 	
-	double span = 0;
-	double chord_root = 0;
-	double chord_tip = 0;
-	double mass = 0;
+	Airfoil* airfoil;
 
 	double sum_impulse = 0;
 	double sum_energy = 0;
@@ -29,13 +26,17 @@ public:
 	
 	double t = 0;
 	
-	// swing attributes (deg, deg, Hz);
+	void update(Vec2 airflow, double air_dens, double dt, bool print_elems = false);
+	
+	double span = 0;
+	double chord_root = 0;
+	double chord_tip = 0;
+	double mass = 0;
+	
 	double amplitude = 0;
 	double collective = 0;
 	double freq = 0;
 	double sweep_plane_angle = 0;
-	
-	void update(Vec2 airflow, double air_dens, double dt, bool print_elems = false);
 	
 	double thrust = 0;
 	double torque = 0;
@@ -44,6 +45,7 @@ public:
 	double peak_torque = 0;
 	double peak_torque_AC = 0;
 	double peak_lift_moment = 0;
+	double specific_power = 0;
 	
 	double getAvgThrust();
 	double getAvgPower();
@@ -53,7 +55,18 @@ public:
 	void printDebug();
 	void printInfo(bool verbose = false);
 	
+	void setSpan(double span);
+	void setChordRoot(double chord_root);
+	void setChordTip(double chord_tip);
+	void setMass(double mass);
+	void setAmplitude(double amplitude);
+	void setCollective(double collective);
+	void setFreq(double freq);
+	void setSweepPlaneAngle(double sweep_plane_angle);
+		
 	void reset();
+	void build();
+	void rebuild();
 	
 	~Blade();
 };
