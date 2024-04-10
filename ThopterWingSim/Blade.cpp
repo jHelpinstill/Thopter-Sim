@@ -10,7 +10,6 @@ Blade::Blade(double span, double chord_root, double chord_tip, double mass, Airf
 	amplitude(amplitude),
 	airfoil(af)
 {
-	Blade();
 	build();
 }
 
@@ -221,7 +220,7 @@ void Blade::printDebug()
 
 void Blade::printInfo(bool verbose)
 {
-	std::cout << "Blade ID: " << ID << 
+	std::cout <<
 	"\nDimensions:\n  span: " << span <<
 	"\n  chord root:\t" << chord_root << 
 	"\n  chord tip:\t" << chord_tip << 
@@ -267,5 +266,3 @@ Blade::~Blade()
 	for(int i = 0; i < num_elems; i++)
 		delete[] regions[i];
 }
-
-int Blade::next_ID = 0;

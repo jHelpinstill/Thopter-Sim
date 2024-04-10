@@ -17,11 +17,8 @@ private:
 	double sum_impulse = 0;
 	double sum_energy = 0;
 	
-	int ID;
-	static int next_ID;
-	
 public:
-	Blade() : ID(next_ID++){}
+	Blade(){}
 	Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude);
 	
 	double t = 0;

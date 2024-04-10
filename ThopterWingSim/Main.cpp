@@ -225,11 +225,12 @@ void testLoop()
 }
 
 int main()
-{	
+{
 	Airfoil NACA_0012;
 	NACA_0012.attachData("airfoil_NACA_0012.txt");
-
-	BladeTester tester;
+	
+	GradientAscent tester;
+	
 	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
 	blade.freq = 20;
 	
@@ -239,10 +240,9 @@ int main()
 	
 //	tester.addIndepVar(&blade.freq, 1, 15);
 	tester.addIndepVar(&blade.collective, 1, 60, "coll");
-	tester.addIndepVar(&blade.chord_root, 0.01, 0.1, "cr");
-	tester.addIndepVar(&blade.chord_tip, 0.01, 0.1, "ct");
+	tester.addIndepVar(&blade.amplitude, 20, 30, "amp");
 	tester.setDepVar(&blade.specific_power);
-	tester.runTest(10, false, false);
+	tester.runTest(25, false, true);
 	
 //	bool running = true;
 //	while(running)

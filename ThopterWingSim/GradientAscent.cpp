@@ -1,6 +1,6 @@
 #include "BladeTester.h"
 
-void BladeTester::runSim()
+void GradientAscent::runSim()
 {
 	blade->reset();
 	blade->rebuild();
@@ -14,7 +14,7 @@ void BladeTester::runSim()
 		blade->update(Vec2(0, 0), 1.225, dt);
 	}
 }
-void BladeTester::runTest(int num_rebounds, bool start_midpoint, bool verbose)
+void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose)
 {
 	double search_step = 0.05; // step size when adjusting dependent variables
 	double walk_step = 1;
@@ -68,14 +68,11 @@ void BladeTester::runTest(int num_rebounds, bool start_midpoint, bool verbose)
 			for(double& a : dir_of_max.axes) std::cout << "  " << a << std::endl;
 			blade->printInfo(true);
 		}
-		else
+		for(auto& a : indep_vars)
 		{
-			for(auto& a : indep_vars)
-			{
-				a.print(); std::cout << ",\t";
-			}
-			dep_var.print(); std::cout << std::endl;
+			a.print(); std::cout << ",\t";
 		}
+		dep_var.print(); std::cout << std::endl;
 		if((dep_var.getValue() < dep_var.prev_val))
 		{
 			for(int i = 0; i < indep_vars.size(); i++)
@@ -88,7 +85,9 @@ void BladeTester::runTest(int num_rebounds, bool start_midpoint, bool verbose)
 			for(auto& a : indep_vars)
 				if(!a.at_bounds) a.walk_step *= 0.5;
 			search_step *= 0.5;
-			std::cout << "new steps: walk: " << walk_step << ", search: " << search_step << std::endl;
+			std::cout << "new steps: walk: ";
+			for(auto& a : indep_vars) std::cout << a.walk_step << ", ";
+			std::cout << "search: " << search_step << std::endl;
 		}
 		else
 		{
@@ -96,20 +95,34 @@ void BladeTester::runTest(int num_rebounds, bool start_midpoint, bool verbose)
 				if(!a.at_bounds) a.walk_step *= 1.05;
 			search_step *= 1.05;
 		}
+		results.push_back(ResultData(indep_vars, dep_var.getValue()));
 	}
 	std::cout << "\nFinished! Final results:\n" << std::endl;
 	blade->printInfo(true);
+	printResultsCSV();
 }
 
-void BladeTester::attachBlade(Blade* blade)
+void GradientAscent::attachBlade(Blade* blade)
 {
 	this->blade = blade;
 }
-void BladeTester::setDepVar(double* param, std::string name)
+void GradientAscent::setDepVar(double* param, std::string name)
 {
 	dep_var = DepVar(param, name);
 }
-void BladeTester::addIndepVar(double* param, double lower, double upper, std::string name)
+void GradientAscent::addIndepVar(double* param, double lower, double upper, std::string name)
 {
 	indep_vars.push_back(IndepVar(param, lower, upper, name));
+}
+void GradientAscent::printResultsCSV()
+{
+	for(auto& a : indep_vars)
+		std::cout << a.name << "\t";
+	std::cout << dep_var.name << std::endl;
+	for(auto& r : results)
+	{
+		for(double v : r.indep_vars)
+			std::cout << v << "\t";
+		std::cout << r.dep_var << std::endl;
+	}
 }

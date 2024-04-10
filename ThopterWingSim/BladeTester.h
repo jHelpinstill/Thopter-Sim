@@ -95,18 +95,36 @@ struct StateVector
 	}
 };
 
-class BladeTester
+struct ResultData
+{
+	ResultData(){}
+	ResultData(std::vector<IndepVar>& vars, double dep_var) : dep_var(dep_var)
+	{
+		addIndep(vars);
+	}
+	std::vector<double> indep_vars;
+	double dep_var;
+	
+	void addIndep(std::vector<IndepVar>& vars)
+	{
+		for(int i = 0; i < vars.size(); i++)
+			indep_vars.push_back(vars[i].getValue());
+	}
+};
+
+class GradientAscent
 {
 private:
 	Blade* blade;
 	
 	std::vector<IndepVar> indep_vars;
 	DepVar dep_var;
+	std::vector<ResultData> results;
 	
 	void runSim();
 	
 public:
-	BladeTester(){}
+	GradientAscent(){}
 	
 	double sim_num_periods;
 	double iters_per_period;
@@ -115,6 +133,8 @@ public:
 	void addIndepVar(double* param, double lower, double upper, std::string name = "var");
 	void setDepVar(double* param, std::string name = "var");
 	void runTest(int num_rebounds, bool start_midpoint = true, bool verbose = false);	// gradient descent maximizer
+	
+	void printResultsCSV();
 //	void setTestParameters(double* test_param, double lower, double higher, int num_divisions);
 };
 
