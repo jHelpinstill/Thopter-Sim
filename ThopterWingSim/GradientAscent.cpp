@@ -17,7 +17,7 @@ void GradientAscent::runSim()
 void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose)
 {
 	double search_step = 0.05; // step size when adjusting dependent variables
-	double walk_step = 1;
+	double walk_step = 0.2;
 	if(start_midpoint) for(auto& var : indep_vars)
 	{	// set independent variables to their allowed midpoint
 		var.setValue((var.upper + var.lower) / 2);
@@ -52,10 +52,11 @@ void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose
 			gradient.axes[i] = (y_plus - y_minus) / (x_plus - x_minus);
 		}
 		
-		StateVector dir_of_max = gradient.unit();
+		// Move state vector position in the direction of the gradient
+		StateVector dir_of_max = gradient.unit() * walk_step;
 		for(int i = 0; i < indep_vars.size(); i++)
 		{
-			indep_vars[i].adjustValue(dir_of_max.axes[i] * indep_vars[i].walk_step);
+			indep_vars[i].setValue(indep_vars[i].getValue()  + dir_of_max.axes[i]);
 		}
 		runSim();
 		
@@ -73,6 +74,11 @@ void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose
 			a.print(); std::cout << ",\t";
 		}
 		dep_var.print(); std::cout << std::endl;
+		std::cout << "Gradient: ";
+		for(double& a : gradient.axes) std::cout << "  " << a;
+		std::cout << std::endl;
+		
+		// if the output is now lower than it was, back up and reduce the walk step size
 		if((dep_var.getValue() < dep_var.prev_val))
 		{
 			for(int i = 0; i < indep_vars.size(); i++)
@@ -82,17 +88,13 @@ void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose
 			runSim();
 			std::cout << "\nCUTTING STEPS IN HALF" << std::endl;
 			halves--;
-			for(auto& a : indep_vars)
-				if(!a.at_bounds) a.walk_step *= 0.5;
+			walk_step *= 0.5;
 			search_step *= 0.5;
-			std::cout << "new steps: walk: ";
-			for(auto& a : indep_vars) std::cout << a.walk_step << ", ";
-			std::cout << "search: " << search_step << std::endl;
+			std::cout << "new steps: walk: " << walk_step << ", search: " << search_step << std::endl;
 		}
 		else
 		{
-			for(auto& a : indep_vars)
-				if(!a.at_bounds) a.walk_step *= 1.05;
+			walk_step *= 1.05;
 			search_step *= 1.05;
 		}
 		results.push_back(ResultData(indep_vars, dep_var.getValue()));

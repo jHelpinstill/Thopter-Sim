@@ -145,14 +145,14 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		elems[i].angle = twist;
 		elems[i].vel = Vec2(angular_vel * radius, 0);
 		
-		Vec2 diskVel;
+		Vec2 disk_vel;
 		if(under)
-			diskVel = regions[i][0].getDiskVel(t, air_dens) * (2 * s);
+			disk_vel = regions[i][0].getDiskVel(t, air_dens) * (2 * s);
 		else if(over)
-			diskVel = regions[i][regions_per_elem - 1].getDiskVel(t, air_dens) * (1 - 2 * s);
+			disk_vel = regions[i][regions_per_elem - 1].getDiskVel(t, air_dens) * (1 - 2 * s);
 		else
-			diskVel = (regions[i][airflow_region].getDiskVel(t, air_dens) * (1 - s)) + (regions[i][airflow_region + 1].getDiskVel(t, air_dens) * s);
-		elems[i].calculateForces(airflow + diskVel, air_dens);
+			disk_vel = (regions[i][airflow_region].getDiskVel(t, air_dens) * (1 - s)) + (regions[i][airflow_region + 1].getDiskVel(t, air_dens) * s);
+		elems[i].calculateForces(airflow + disk_vel, air_dens);
 		
 		if(under)
 			regions[i][0].addThrust(2 * s * elems[i].force.y, dt);

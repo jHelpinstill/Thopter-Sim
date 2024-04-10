@@ -4,8 +4,8 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = Main.o Airfoil.o Blade.o SweptRegion.o GradientAscent.o
-LINKOBJ  = Main.o Airfoil.o Blade.o SweptRegion.o GradientAscent.o
+OBJ      = Main.o Airfoil.o Blade.o SweptRegion.o GradientAscent.o PlotGenerator.o
+LINKOBJ  = Main.o Airfoil.o Blade.o SweptRegion.o GradientAscent.o PlotGenerator.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -lgdi32 -mconsole
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -38,3 +38,6 @@ SweptRegion.o: SweptRegion.cpp
 
 GradientAscent.o: GradientAscent.cpp
 	$(CPP) -c GradientAscent.cpp -o GradientAscent.o $(CXXFLAGS)
+
+PlotGenerator.o: PlotGenerator.cpp
+	$(CPP) -c PlotGenerator.cpp -o PlotGenerator.o $(CXXFLAGS)

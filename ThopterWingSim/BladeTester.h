@@ -11,27 +11,33 @@ struct IndepVar
 	std::string name;
 	IndepVar(){}
 	IndepVar(double* param, double lower, double upper, std::string name = "") : 
-		param(param), lower(lower), upper(upper), name(name), walk_step(0.2), at_bounds(false) {}
+		param(param), lower(lower), upper(upper), name(name), at_bounds(false), bounds_active(true) {}
+	IndepVar(double* param, std::string name = "") : 
+		param(param), name(name), bounds_active(false) {}
 		
 	double* param;
 	
 	double lower;
 	double upper;
-	double walk_step;
 	bool at_bounds;
+	bool bounds_active;
 	
 	void setValue(double val)
 	{
-		at_bounds = false;
-		if(val > upper)
-			{ val = upper; at_bounds = true; }
-		else if(val < lower)
-			{ val = lower; at_bounds = true; }
+		if(bounds_active)
+		{
+			at_bounds = false;
+			if(val > upper)
+				{ val = upper; at_bounds = true; }
+			else if(val < lower)
+				{ val = lower; at_bounds = true; }
+		}
 		*param = val;
 	}
 	void adjustValue(double step)
 	{
-		setValue(*param + (upper - lower) * step);
+		if(bounds_active) setValue(*param + (upper - lower) * step);
+		else setValue(*param + step);
 	}
 	double getValue()
 	{
@@ -98,11 +104,14 @@ struct StateVector
 struct ResultData
 {
 	ResultData(){}
+	ResultData(double indep_var, double dep_var) : indep_var(indep_var), dep_var(dep_var) {}
 	ResultData(std::vector<IndepVar>& vars, double dep_var) : dep_var(dep_var)
 	{
 		addIndep(vars);
 	}
+	
 	std::vector<double> indep_vars;
+	double indep_var;
 	double dep_var;
 	
 	void addIndep(std::vector<IndepVar>& vars)
@@ -124,7 +133,7 @@ private:
 	void runSim();
 	
 public:
-	GradientAscent(){}
+	GradientAscent() : sim_num_periods(4), iters_per_period(100) {}
 	
 	double sim_num_periods;
 	double iters_per_period;
@@ -135,7 +144,57 @@ public:
 	void runTest(int num_rebounds, bool start_midpoint = true, bool verbose = false);	// gradient descent maximizer
 	
 	void printResultsCSV();
-//	void setTestParameters(double* test_param, double lower, double higher, int num_divisions);
 };
+
+class PlotGenerator
+{
+private:
+	Blade* blade;
+	IndepVar indep_var;
+	DepVar dep_var;
+	
+	std::vector<ResultData> results;
+	
+	void runSim();
+	
+public:
+	PlotGenerator() : 
+		sim_num_periods(4),
+		iters_per_period(100),
+		indep_output_scale(1),
+		dep_output_scale(1)
+	{}
+	
+	void run(bool verbose = false);
+	void run(double from, double to, double incr, bool verbose = false);
+	
+	double from;
+	double to;
+	double incr;
+	void setAttributes(double from, double to, double incr);
+	
+	double sim_num_periods;
+	double iters_per_period;
+	double indep_output_scale;
+	double dep_output_scale;
+	
+	void attachBlade(Blade* blade);
+	void setIndepVar(double* param, std::string name = "var");
+	void setDepVar(double* param, std::string name = "var");
+	void printResultsCSV();
+};
+
+void SimulateBlade(Blade* blade, int num_periods, int iters_per_period, bool verbose = false)
+{
+	blade->reset();
+	
+	double period = 1 / blade->freq;
+	double dt = period / iters_per_period;
+	int iterations = iters_per_period * num_periods;
+	for(int i = 0; i < iterations; i++)
+	{
+		blade->update(Vec2(0, 0), 1.225, dt, verbose);
+	}
+}
 
 #endif

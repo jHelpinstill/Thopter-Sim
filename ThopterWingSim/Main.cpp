@@ -229,20 +229,33 @@ int main()
 	Airfoil NACA_0012;
 	NACA_0012.attachData("airfoil_NACA_0012.txt");
 	
-	GradientAscent tester;
-	
 	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
 	blade.freq = 20;
 	
-	tester.attachBlade(&blade);
-	tester.sim_num_periods = 4;
-	tester.iters_per_period = 100;
+	PlotGenerator plotter;
+	plotter.attachBlade(&blade);
+	plotter.setIndepVar(&blade.collective, "collective");
+	plotter.setDepVar(&blade.specific_power, "spec power");
+	plotter.dep_output_scale = (746 / 4.448);
 	
-//	tester.addIndepVar(&blade.freq, 1, 15);
-	tester.addIndepVar(&blade.collective, 1, 60, "coll");
-	tester.addIndepVar(&blade.amplitude, 20, 30, "amp");
-	tester.setDepVar(&blade.specific_power);
-	tester.runTest(25, false, true);
+	blade.collective = 60;
+	SimulateBlade(&blade, 1, 100, true);
+//	plotter.run(1, 90, 1);
+	
+//	GradientAscent tester;
+//	
+//	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
+//	blade.freq = 20;
+//	
+//	tester.attachBlade(&blade);
+//	tester.sim_num_periods = 4;
+//	tester.iters_per_period = 100;
+//	
+////	tester.addIndepVar(&blade.freq, 1, 15);
+//	tester.addIndepVar(&blade.collective, 1, 60, "coll");
+//	tester.addIndepVar(&blade.amplitude, 1, 60, "amp");
+//	tester.setDepVar(&blade.specific_power, "spec_p");
+//	tester.runTest(25, true, false);
 	
 //	bool running = true;
 //	while(running)
