@@ -125,19 +125,16 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		s -= airflow_region;
 	s -= 0.5;
 	
-//	std::cout << "\n///// BLADE UPDATE: s = " << s << "\tairflow region: " << airflow_region << "\tstate: ";
-//	if(under) std::cout << "under" << std::endl;
-//	else if(over) std::cout << "over" << std::endl;
-//	else std::cout << "normal" << std::endl;
-	
+	double angular_vel = amplitude * pi_over_180 * w * cos(w * t);	// rads / s
+	double angular_accel = amplitude * pi_over_180 * w * w * -sin(w * t); // rads / s^2
 	if(print_elems)
 	{
+		std::cout << "blade position: " << sin(w * t) * amplitude << "deg";
+		std::cout << "\tblade velocity: " << angular_vel << "rad/s, " << angular_vel / pi_over_180 << "deg/s";
+		std::cout << "\tblade accel: " << angular_accel << "rad/s^2, " << angular_accel / pi_over_180 << "deg/s^2" << std::endl;
 		printRegions();
 		printElems();
 	}
-	
-	double angular_vel = amplitude * pi_over_180 * w * cos(w * t);	// rads / s
-	double angular_accel = amplitude * pi_over_180 * w * w * -sin(w * t); // rads / s^2
 	for(int i = 0; i < num_elems; i++)
 	{
 		double radius = span * (double)i / num_elems;
@@ -178,8 +175,9 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		peak_torque_AC = torque_AC;
 		
 	sum_impulse += thrust * dt;
-	sum_energy += torque * w * dt;
-	specific_power = getAvgThrust() / getAvgPower();
+	sum_energy += torque * angular_vel * dt;
+	avg_thrust = getAvgThrust();
+	specific_thrust = getAvgThrust() / getAvgPower();
 }
 
 double Blade::getAvgThrust()
@@ -193,7 +191,7 @@ double Blade::getAvgPower()
 {
 	if(t == 0)
 		return 0;
-	return sum_energy / t;
+	return -sum_energy / t;
 }
 
 void Blade::printDebug()
@@ -227,7 +225,7 @@ void Blade::printInfo(bool verbose)
 	"\n  mass:\t" << mass <<
 	"\n  avg thrust:\t" << getAvgThrust() <<
 	"\n  avg Power:\t" << getAvgPower() <<
-	"\n  spec power:\t" << specific_power << "N/w, " << specific_power * (1000 / 9.8) << "g/w, " << specific_power * (746 / 4.448) << "lbs/hp";
+	"\n  spec thrust:\t" << specific_thrust << "N/w, " << specific_thrust * (1000 / 9.8) << "g/w, " << specific_thrust * (746 / 4.448) << "lbs/hp";
 	
 	if(verbose)
 	{

@@ -230,17 +230,20 @@ int main()
 	NACA_0012.attachData("airfoil_NACA_0012.txt");
 	
 	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
-	blade.freq = 20;
+	blade.freq = 10;
+	blade.collective = 14;
 	
 	PlotGenerator plotter;
 	plotter.attachBlade(&blade);
-	plotter.setIndepVar(&blade.collective, "collective");
-	plotter.setDepVar(&blade.specific_power, "spec power");
+	plotter.setIndepVar(&blade.freq, "frequency");
+	plotter.setDepVar(&blade.specific_thrust, "specific Thrust");
 	plotter.dep_output_scale = (746 / 4.448);
+	plotter.run(1, 40, 1);
 	
-	blade.collective = 60;
-	SimulateBlade(&blade, 1, 100, true);
-//	plotter.run(1, 90, 1);
+//	blade.collective = 80;
+//	SimulateBlade(&blade, 1, 100, false);
+//	blade.printInfo(true);
+	
 	
 //	GradientAscent tester;
 //	

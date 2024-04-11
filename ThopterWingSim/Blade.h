@@ -42,7 +42,8 @@ public:
 	double peak_torque = 0;
 	double peak_torque_AC = 0;
 	double peak_lift_moment = 0;
-	double specific_power = 0;
+	double specific_thrust = 0;
+	double avg_thrust = 0;
 	
 	double getAvgThrust();
 	double getAvgPower();
