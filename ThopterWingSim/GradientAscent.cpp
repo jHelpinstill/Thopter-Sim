@@ -28,9 +28,10 @@ void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose
 	StateVector prev_position(indep_vars.size());
 	int iteration = 0;
 	int halves = num_rebounds;
+	double prev_dep_val;
 	while(halves >= 0)
 	{
-		dep_var.prev_val = dep_var.getValue();
+		prev_dep_val = dep_var.getValue();
 		
 		// Estimate partial derivatives for each independent variable, and update gradient vector
 		for(int i = 0; i < indep_vars.size(); i++)
@@ -79,7 +80,7 @@ void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose
 		std::cout << std::endl;
 		
 		// if the output is now lower than it was, back up and reduce the walk step size
-		if((dep_var.getValue() < dep_var.prev_val))
+		if((dep_var.getValue() < prev_dep_val))
 		{
 			for(int i = 0; i < indep_vars.size(); i++)
 			{
@@ -110,11 +111,11 @@ void GradientAscent::attachBlade(Blade* blade)
 }
 void GradientAscent::setDepVar(double* param, std::string name)
 {
-	dep_var = DepVar(param, name);
+	dep_var = Variable(param, name);
 }
 void GradientAscent::addIndepVar(double* param, double lower, double upper, std::string name)
 {
-	indep_vars.push_back(IndepVar(param, lower, upper, name));
+	indep_vars.push_back(Variable(param, lower, upper, name));
 }
 void GradientAscent::printResultsCSV()
 {

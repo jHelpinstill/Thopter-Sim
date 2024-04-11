@@ -48,11 +48,11 @@ void PlotGenerator::attachBlade(Blade* blade)
 }
 void PlotGenerator::setIndepVar(double* param, std::string name)
 {
-	indep_var = IndepVar(param, name);
+	indep_var = Variable(param, name);
 }
 void PlotGenerator::setDepVar(double* param, std::string name)
 {
-	dep_var = DepVar(param, name);
+	dep_var = Variable(param, name);
 }
 void PlotGenerator::printResultsCSV()
 {

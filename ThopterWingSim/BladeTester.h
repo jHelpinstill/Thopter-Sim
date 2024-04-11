@@ -6,13 +6,13 @@
 #include <string>
 #include <cmath>
 
-struct IndepVar
+struct Variable
 {
 	std::string name;
-	IndepVar(){}
-	IndepVar(double* param, double lower, double upper, std::string name = "") : 
+	Variable(){}
+	Variable(double* param, double lower, double upper, std::string name = "") : 
 		param(param), lower(lower), upper(upper), name(name), at_bounds(false), bounds_active(true) {}
-	IndepVar(double* param, std::string name = "") : 
+	Variable(double* param, std::string name = "") : 
 		param(param), name(name), bounds_active(false) {}
 		
 	double* param;
@@ -39,25 +39,6 @@ struct IndepVar
 		if(bounds_active) setValue(*param + (upper - lower) * step);
 		else setValue(*param + step);
 	}
-	double getValue()
-	{
-		return *param;
-	}
-	void print()
-	{
-		std::cout << name << ": " << *param;
-	}
-};
-
-struct DepVar
-{
-	std::string name;
-	DepVar(){}
-	DepVar(double* param, std::string name = "") : param(param), name(name), prev_val(0) {}
-	
-	double* param;
-	double prev_val;
-	
 	double getValue()
 	{
 		return *param;
@@ -105,7 +86,7 @@ struct ResultData
 {
 	ResultData(){}
 	ResultData(double indep_var, double dep_var) : indep_var(indep_var), dep_var(dep_var) {}
-	ResultData(std::vector<IndepVar>& vars, double dep_var) : dep_var(dep_var)
+	ResultData(std::vector<Variable>& vars, double dep_var) : dep_var(dep_var)
 	{
 		addIndep(vars);
 	}
@@ -114,7 +95,7 @@ struct ResultData
 	double indep_var;
 	double dep_var;
 	
-	void addIndep(std::vector<IndepVar>& vars)
+	void addIndep(std::vector<Variable>& vars)
 	{
 		for(int i = 0; i < vars.size(); i++)
 			indep_vars.push_back(vars[i].getValue());
@@ -126,8 +107,8 @@ class GradientAscent
 private:
 	Blade* blade;
 	
-	std::vector<IndepVar> indep_vars;
-	DepVar dep_var;
+	std::vector<Variable> indep_vars;
+	Variable dep_var;
 	std::vector<ResultData> results;
 	
 	void runSim();
@@ -150,8 +131,8 @@ class PlotGenerator
 {
 private:
 	Blade* blade;
-	IndepVar indep_var;
-	DepVar dep_var;
+	Variable indep_var;
+	Variable dep_var;
 	
 	std::vector<ResultData> results;
 	
@@ -184,17 +165,17 @@ public:
 	void printResultsCSV();
 };
 
-void SimulateBlade(Blade* blade, int num_periods, int iters_per_period, bool verbose = false)
-{
-	blade->reset();
-	
-	double period = 1 / blade->freq;
-	double dt = period / iters_per_period;
-	int iterations = iters_per_period * num_periods;
-	for(int i = 0; i < iterations; i++)
-	{
-		blade->update(Vec2(0, 0), 1.225, dt, verbose);
-	}
-}
+void SimulateBlade(Blade* blade, int num_periods, int iters_per_period, bool verbose = false);
+//{
+//	blade->reset();
+//	
+//	double period = 1 / blade->freq;
+//	double dt = period / iters_per_period;
+//	int iterations = iters_per_period * num_periods;
+//	for(int i = 0; i < iterations; i++)
+//	{
+//		blade->update(Vec2(0, 0), 1.225, dt, verbose);
+//	}
+//}
 
 #endif
