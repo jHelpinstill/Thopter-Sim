@@ -65,7 +65,7 @@ void Blade::printRegions()
 	}
 }
 
-void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
+void Blade::update(double air_dens, double dt, bool print_elems)
 {
 //	std::cout << "getavgthr: " << getAvgThrust() << std::endl;
 	force = Vec2(0, 0);
@@ -137,9 +137,10 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 	
 	transverse_thrust *= cos(angular_position * pi_over_180);
 	force = Vec2(transverse_thrust, axial_thrust).rotate(sweep_plane_angle * pi_over_180);
+	force_angle = force.angle();
+	force_mag = force.mag();
 	
-	power = torque * angular_vel;
-	specific_thrust = axial_thrust / power;
+	power = -torque * angular_vel;
 	
 	if(torque > peak_torque)
 		peak_torque = torque;
@@ -179,7 +180,9 @@ void Blade::printInfo(bool verbose)
 	"\n  chord root:\t" << chord_root << 
 	"\n  chord tip:\t" << chord_tip << 
 	"\n  mass:\t" << mass <<
-	"\n  spec thrust:\t" << specific_thrust << "N/w, " << specific_thrust * (1000 / 9.8) << "g/w, " << specific_thrust * (746 / 4.448) << "lbs/hp";
+	"\n  axial thrust:\t" << axial_thrust <<
+	"\n  power:\t" << power;
+//	"\n  spec thrust:\t" << specific_thrust << "N/w, " << specific_thrust * (1000 / 9.8) << "g/w, " << specific_thrust * (746 / 4.448) << "lbs/hp";
 	
 	if(verbose)
 	{

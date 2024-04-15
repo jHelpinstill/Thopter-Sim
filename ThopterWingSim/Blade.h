@@ -21,7 +21,7 @@ public:
 	Blade(){}
 	Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude);
 	
-	void update(Vec2 airflow, double air_dens, double dt, bool print_elems = false);
+	void update(double air_dens, double dt, bool print_elems = false);
 	
 	/// SETTINGS
 	double span = 0;
@@ -32,6 +32,7 @@ public:
 	double collective = 0;
 	double freq = 0;
 	double sweep_plane_angle = 0;
+	Vec2 airflow;
 
 	/// OUTPUTS
 	double t = 0;
@@ -39,6 +40,8 @@ public:
 	double axial_thrust = 0;
 	double transverse_thrust = 0;
 	Vec2 force;
+	double force_angle = 0;
+	double force_mag = 0;
 	double torque = 0;
 	double transverse_moment = 0;
 	double lift_moment = 0;
@@ -46,7 +49,6 @@ public:
 	double peak_transverse_moment = 0;
 	double peak_lift_moment = 0;
 	double power = 0;
-	double specific_thrust = 0;
 	
 	void printElems();
 	void printRegions();

@@ -11,7 +11,7 @@ void GradientAscent::runSim()
 //	std::cout << "iterations: " << iterations << "\tperiod: " << period << "\tdt: " << dt << std::endl;
 	for(int i = 0; i < iterations; i++)
 	{
-		blade->update(Vec2(0, 0), 1.225, dt);
+		blade->update(1.225, dt);
 	}
 }
 void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose)
