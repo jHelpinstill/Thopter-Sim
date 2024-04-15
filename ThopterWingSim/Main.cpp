@@ -240,6 +240,7 @@ int main()
 	blade.airflow = Vec2(-50, 0);
 	
 	PlotGenerator plotter;
+	plotter.sim_num_periods = 4;
 	plotter.attachBlade(&blade);
 //	plotter.setIndepVar(&blade.sweep_plane_angle, "angle");
 	plotter.setIndepVar(&blade.collective, "collective");
