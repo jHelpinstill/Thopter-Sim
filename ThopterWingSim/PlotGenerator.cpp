@@ -11,7 +11,32 @@ void PlotGenerator::runSim()
 	for(int i = 0; i < iterations; i++)
 	{
 		blade->update(Vec2(0, 0), 1.225, dt);
+		for(auto& v : dep_vars)
+			if(v.average) v.recordAvg(blade->t);
 	}
+}
+void PlotGenerator::runRealTime(double periods_to_skip_over, int sampling_freq)
+{
+	blade->reset();
+	blade->rebuild();
+	
+	double period = 1 / blade->freq;
+	double dt = period / iters_per_period;
+	int iterations = iters_per_period * sim_num_periods;
+	int skipped_iters = (iters_per_period * periods_to_skip_over);
+	
+	std::vector<Variable> dummy_indep;
+	for(int i = 0; i < iterations; i++)
+	{
+		blade->update(Vec2(0, 0), 1.225, dt);
+		for(auto& v : dep_vars)
+			if(v.average) v.recordAvg(blade->t);
+		if(i >= skipped_iters)
+			if(!((i - skipped_iters) % sampling_freq))
+				results.push_back(ResultDatum(dummy_indep, dep_vars));
+	}
+	std::cout << "\nFinished! Final results:\n" << std::endl;
+	printResultsCSV();
 }
 void PlotGenerator::run(bool verbose)
 {
@@ -22,11 +47,18 @@ void PlotGenerator::run(bool verbose)
 		runSim();
 		if(verbose)
 		{
-			std::cout << indep_var.name << ": " << indep_var.getValue() << "\t" << dep_var.name << ": " << dep_var.getValue() << std::endl;
 			blade->printInfo(true);
 		}
-		results.push_back(ResultData(indep_var.getValue(), dep_var.getValue()));
+		results.push_back(ResultDatum(indep_var.getValue(), dep_vars));
 		indep_var.adjustValue(incr);
+		for(auto& v : dep_vars)
+		{
+			if(v.average)
+			{
+				v.prev_t = 0;
+				v.sum = 0;
+			}
+		}
 	}
 	std::cout << "\nFinished! Final results:\n" << std::endl;
 	printResultsCSV();
@@ -50,16 +82,23 @@ void PlotGenerator::setIndepVar(double* param, std::string name)
 {
 	indep_var = Variable(param, name);
 }
-void PlotGenerator::setDepVar(double* param, std::string name)
+void PlotGenerator::addDepVar(double* param, std::string name, double output_scale, bool average)
 {
-	dep_var = Variable(param, name);
+	dep_vars.push_back(Variable(param, name, output_scale, average));
 }
 void PlotGenerator::printResultsCSV()
 {
-	std::cout << indep_var.name << ", ";
-	std::cout << dep_var.name << std::endl;
+	std::cout << indep_var.name;
+	if(indep_var.name.length() != 0) std::cout << ", ";
+	for(auto& v : dep_vars)
+		std::cout << v.name << ", ";
+	std::cout << "\b\b \b" << std::endl;
 	for(auto& r : results)
 	{
-		std::cout << r.indep_var * indep_output_scale << ", " << r.dep_var * dep_output_scale << std::endl;
+		for(auto& v : r.indep_vars)
+			std::cout << v << ", ";
+		for(auto& v : r.dep_vars)
+			std::cout << v << ", ";
+		std::cout << "\b\b \b" << std::endl;
 	}
 }

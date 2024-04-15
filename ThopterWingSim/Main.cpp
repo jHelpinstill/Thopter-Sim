@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+//#include <filesystem>
 #include "Airfoil.h"
 #include "Blade.h"
 #include "Vec2.h"
@@ -100,6 +101,9 @@ std::vector<Airfoil*> airfoils;
 
 void addAirfoil()
 {
+//	for(const auto& entry : std::filesystem::directory_iterator())
+//		std::cout << entry.path() << std::endl;
+	
 	std::string name;
 	std::cout << "\nEnter airfoil name: ";
 	std::cin.ignore(1,'\n'); std::getline(std::cin, name);
@@ -226,19 +230,23 @@ void testLoop()
 
 int main()
 {
-	Airfoil NACA_0012;
-	NACA_0012.attachData("airfoil_NACA_0012.txt");
-	
-	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);
-	blade.freq = 10;
-	blade.collective = 14;
-	
-	PlotGenerator plotter;
-	plotter.attachBlade(&blade);
-	plotter.setIndepVar(&blade.freq, "frequency");
-	plotter.setDepVar(&blade.specific_thrust, "specific Thrust");
-	plotter.dep_output_scale = (746 / 4.448);
-	plotter.run(1, 40, 1);
+//	Airfoil NACA_0012;
+//	NACA_0012.attachData("airfoil_NACA_0012.txt");
+//	
+//	Blade blade(1, 0.1, 0.05, 10.0 / 216.0, &NACA_0012, 20, 22.5);
+//	blade.freq = 20;
+//	blade.collective = 14;
+//	
+//	PlotGenerator plotter;
+//	plotter.attachBlade(&blade);
+//	plotter.setIndepVar(&blade.collective, "collective");
+////	plotter.addDepVar(&blade.t, "time");
+//	plotter.addDepVar(&blade.axial_thrust, "axial thrust", 1.0, true);
+//	plotter.addDepVar(&blade.transverse_thrust, "transverse thrust", 1.0, true);
+////	plotter.dep_output_scale = (746 / 4.448);
+//	plotter.run(0, 90, 1, true);
+////	plotter.sim_num_periods = 5;
+////	plotter.runRealTime(4, 1);
 	
 //	blade.collective = 80;
 //	SimulateBlade(&blade, 1, 100, false);
@@ -257,41 +265,43 @@ int main()
 ////	tester.addIndepVar(&blade.freq, 1, 15);
 //	tester.addIndepVar(&blade.collective, 1, 60, "coll");
 //	tester.addIndepVar(&blade.amplitude, 1, 60, "amp");
-//	tester.setDepVar(&blade.specific_power, "spec_p");
+//	tester.setDepVar(&blade.specific_thrust, "spec_thrust");
 //	tester.runTest(25, true, false);
 	
-//	bool running = true;
-//	while(running)
-//	{
-//		char input;
-//		std::cout << "Options: blades (b), tests (t), airfoils (a), quit (q)... ";
-//		std::cin >> input;
-//		switch(input)
-//		{
-//			case 'b':
-//			{
-//				bladeLoop();
-//				break;
-//			}
-//			case 't':
-//			{
-//				testLoop();
-//				break;
-//			}
-//			case 'a':
-//			{
-//				airfoilLoop();
-//				break;
-//			}
-//			case 'q':
-//			{
-//				std::cout << "\n  Quitting...";
-//				running = false;
-//				break;
-//			}
-//		}
-//		if(running) std::cout << "\n///// Main Menu /////" << std::endl;
-//	}
+	
+///// USER INTERFACE CODE /////
+	bool running = true;
+	while(running)
+	{
+		char input;
+		std::cout << "Options: blades (b), tests (t), airfoils (a), quit (q)... ";
+		std::cin >> input;
+		switch(input)
+		{
+			case 'b':
+			{
+				bladeLoop();
+				break;
+			}
+			case 't':
+			{
+				testLoop();
+				break;
+			}
+			case 'a':
+			{
+				airfoilLoop();
+				break;
+			}
+			case 'q':
+			{
+				std::cout << "\n  Quitting...";
+				running = false;
+				break;
+			}
+		}
+		if(running) std::cout << "\n///// Main Menu /////" << std::endl;
+	}
 	
 //	BladeTester tester;
 //	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);

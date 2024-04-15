@@ -98,7 +98,7 @@ void GradientAscent::runTest(int num_rebounds, bool start_midpoint, bool verbose
 			walk_step *= 1.05;
 			search_step *= 1.05;
 		}
-		results.push_back(ResultData(indep_vars, dep_var.getValue()));
+		results.push_back(ResultDatum(indep_vars, dep_var.getValue()));
 	}
 	std::cout << "\nFinished! Final results:\n" << std::endl;
 	blade->printInfo(true);
@@ -119,13 +119,15 @@ void GradientAscent::addIndepVar(double* param, double lower, double upper, std:
 }
 void GradientAscent::printResultsCSV()
 {
-	for(auto& a : indep_vars)
-		std::cout << a.name << "\t";
+	for(Variable& var : indep_vars)
+		std::cout << var.name << ", ";
 	std::cout << dep_var.name << std::endl;
-	for(auto& r : results)
+	for(auto& datum : results)
 	{
-		for(double v : r.indep_vars)
-			std::cout << v << "\t";
-		std::cout << r.dep_var << std::endl;
+		for(double v : datum.indep_vars)
+			std::cout << v << ", ";
+		for(double v : datum.dep_vars)
+			std::cout << v << ", ";
+		std::cout << std::endl;
 	}
 }

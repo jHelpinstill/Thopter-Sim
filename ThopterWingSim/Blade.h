@@ -21,26 +21,29 @@ public:
 	Blade(){}
 	Blade(double span, double chord_root, double chord_tip, double mass, Airfoil* af, int num_elems, double amplitude);
 	
-	double t = 0;
-	
 	void update(Vec2 airflow, double air_dens, double dt, bool print_elems = false);
 	
+	/// SETTINGS
 	double span = 0;
 	double chord_root = 0;
 	double chord_tip = 0;
-	double mass = 0;
-	
+	double mass = 0;	
 	double amplitude = 0;
 	double collective = 0;
 	double freq = 0;
 	double sweep_plane_angle = 0;
-	
-	double thrust = 0;
+
+	/// OUTPUTS
+	double t = 0;
+	double angular_position = 0;
+	double axial_thrust = 0;
+	double transverse_thrust = 0;
+	Vec2 force;
 	double torque = 0;
-	double torque_AC = 0;
-	
+	double transverse_moment = 0;
+	double lift_moment = 0;
 	double peak_torque = 0;
-	double peak_torque_AC = 0;
+	double peak_transverse_moment = 0;
 	double peak_lift_moment = 0;
 	double specific_thrust = 0;
 	double avg_thrust = 0;
@@ -52,15 +55,6 @@ public:
 	void printRegions();
 	void printDebug();
 	void printInfo(bool verbose = false);
-	
-	void setSpan(double span);
-	void setChordRoot(double chord_root);
-	void setChordTip(double chord_tip);
-	void setMass(double mass);
-	void setAmplitude(double amplitude);
-	void setCollective(double collective);
-	void setFreq(double freq);
-	void setSweepPlaneAngle(double sweep_plane_angle);
 		
 	void reset();
 	void build();

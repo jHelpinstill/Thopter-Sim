@@ -9,13 +9,19 @@
 struct Variable
 {
 	std::string name;
-	Variable(){}
+	Variable() : output_scale(1) {}
 	Variable(double* param, double lower, double upper, std::string name = "") : 
-		param(param), lower(lower), upper(upper), name(name), at_bounds(false), bounds_active(true) {}
-	Variable(double* param, std::string name = "") : 
-		param(param), name(name), bounds_active(false) {}
+		param(param), lower(lower), upper(upper), name(name), at_bounds(false), bounds_active(true), output_scale(1) {}
+	Variable(double* param, std::string name = "", double output_scale = 1, bool average = false) : 
+		param(param), name(name), bounds_active(false), sum(0), prev_t(0), output_scale(output_scale), average(average) {}
 		
 	double* param;
+	
+	bool average;
+	double sum;
+	double output_scale;
+	double prev_t;
+	double t;
 	
 	double lower;
 	double upper;
@@ -39,8 +45,17 @@ struct Variable
 		if(bounds_active) setValue(*param + (upper - lower) * step);
 		else setValue(*param + step);
 	}
+	void recordAvg(double t)
+	{
+		double dt = t - prev_t;
+		sum += *param * dt;
+		prev_t = t;
+		this->t = t;
+	}
 	double getValue()
 	{
+		if(average)
+			return sum / t;
 		return *param;
 	}
 	void print()
@@ -82,23 +97,50 @@ struct StateVector
 	}
 };
 
-struct ResultData
+struct ResultDatum
 {
-	ResultData(){}
-	ResultData(double indep_var, double dep_var) : indep_var(indep_var), dep_var(dep_var) {}
-	ResultData(std::vector<Variable>& vars, double dep_var) : dep_var(dep_var)
+	ResultDatum(){}
+	ResultDatum(double indep_var, double dep_var)
 	{
-		addIndep(vars);
+		addIndep(indep_var);
+		addDep(dep_var);
+	}
+	ResultDatum(std::vector<Variable>& indep_vars, double dep_var)
+	{
+		addIndep(indep_vars);
+		addDep(dep_var);
+	}
+	ResultDatum(double indep_var, std::vector<Variable>& dep_vars)
+	{
+		addIndep(indep_var);
+		addDep(dep_vars);
+	}
+	ResultDatum(std::vector<Variable>& indep_vars, std::vector<Variable>& dep_vars)
+	{
+		addIndep(indep_vars);
+		addDep(dep_vars);
 	}
 	
 	std::vector<double> indep_vars;
-	double indep_var;
-	double dep_var;
+	std::vector<double> dep_vars;
 	
 	void addIndep(std::vector<Variable>& vars)
 	{
-		for(int i = 0; i < vars.size(); i++)
-			indep_vars.push_back(vars[i].getValue());
+		for(auto& v : vars)
+			indep_vars.push_back(v.getValue());
+	} 
+	void addDep(std::vector<Variable>& vars)
+	{
+		for(auto v : vars)	
+			dep_vars.push_back(v.getValue() * v.output_scale);
+	}
+	void addIndep(double var)
+	{
+		indep_vars.push_back(var);
+	}
+	void addDep(double var)
+	{
+		dep_vars.push_back(var);
 	}
 };
 
@@ -109,7 +151,7 @@ private:
 	
 	std::vector<Variable> indep_vars;
 	Variable dep_var;
-	std::vector<ResultData> results;
+	std::vector<ResultDatum> results;
 	
 	void runSim();
 	
@@ -132,9 +174,9 @@ class PlotGenerator
 private:
 	Blade* blade;
 	Variable indep_var;
-	Variable dep_var;
+	std::vector<Variable> dep_vars;
 	
-	std::vector<ResultData> results;
+	std::vector<ResultDatum> results;
 	
 	void runSim();
 	
@@ -142,12 +184,12 @@ public:
 	PlotGenerator() : 
 		sim_num_periods(4),
 		iters_per_period(100),
-		indep_output_scale(1),
-		dep_output_scale(1)
+		indep_output_scale(1)
 	{}
 	
 	void run(bool verbose = false);
 	void run(double from, double to, double incr, bool verbose = false);
+	void runRealTime(double periods_to_skip_over, int sampling_freq = 1);
 	
 	double from;
 	double to;
@@ -157,11 +199,10 @@ public:
 	double sim_num_periods;
 	double iters_per_period;
 	double indep_output_scale;
-	double dep_output_scale;
 	
 	void attachBlade(Blade* blade);
 	void setIndepVar(double* param, std::string name = "var");
-	void setDepVar(double* param, std::string name = "var");
+	void addDepVar(double* param, std::string name = "var", double output_scale = 1, bool average = false);
 	void printResultsCSV();
 };
 
