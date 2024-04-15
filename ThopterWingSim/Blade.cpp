@@ -111,11 +111,11 @@ void Blade::update(double air_dens, double dt, bool print_elems)
 		
 		Vec2 disk_vel;
 		if(under)
-			disk_vel = regions[i][0].getDiskVel(t, air_dens) * (2 * s);
+			disk_vel = regions[i][0].getDiskVel(airflow, t, air_dens) * (2 * s);
 		else if(over)
-			disk_vel = regions[i][regions_per_elem - 1].getDiskVel(t, air_dens) * (1 - 2 * s);
+			disk_vel = regions[i][regions_per_elem - 1].getDiskVel(airflow, t, air_dens) * (1 - 2 * s);
 		else
-			disk_vel = (regions[i][airflow_region].getDiskVel(t, air_dens) * (1 - s)) + (regions[i][airflow_region + 1].getDiskVel(t, air_dens) * s);
+			disk_vel = (regions[i][airflow_region].getDiskVel(airflow, t, air_dens) * (1 - s)) + (regions[i][airflow_region + 1].getDiskVel(airflow, t, air_dens) * s);
 			
 		elems[i].calculateForces(airflow + disk_vel, air_dens);
 		
