@@ -59,7 +59,7 @@ void Blade::printRegions()
 		std::cout << "i: " << i << "\twash: ";
 		for(int j = 0; j < regions_per_elem; j++)
 		{
-			std::cout << regions[i][j].wash << '\t';
+			std::cout << regions[i][j].wash.mag() << '\t';
 		}
 		std::cout << std::endl;
 	}
@@ -116,16 +116,17 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 			disk_vel = regions[i][regions_per_elem - 1].getDiskVel(t, air_dens) * (1 - 2 * s);
 		else
 			disk_vel = (regions[i][airflow_region].getDiskVel(t, air_dens) * (1 - s)) + (regions[i][airflow_region + 1].getDiskVel(t, air_dens) * s);
+			
 		elems[i].calculateForces(airflow + disk_vel, air_dens);
 		
 		if(under)
-			regions[i][0].addThrust(2 * s * elems[i].force.y, dt);
+			regions[i][0].addThrust(elems[i].force * 2 * s, dt);
 		else if(over)
-			regions[i][regions_per_elem - 1].addThrust((1 - 2 * s) * elems[i].force.y, dt);
+			regions[i][regions_per_elem - 1].addThrust(elems[i].force * (1 - 2 * s), dt);
 		else
 		{
-			regions[i][airflow_region].addThrust((1 - s) * elems[i].force.y, dt);
-			regions[i][airflow_region + 1].addThrust(s * elems[i].force.y, dt);
+			regions[i][airflow_region].addThrust(elems[i].force * (1 - s), dt);
+			regions[i][airflow_region + 1].addThrust(elems[i].force * s, dt);
 		}
 		axial_thrust += elems[i].force.y;
 		transverse_thrust += elems[i].force.x;
@@ -135,12 +136,10 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 	}
 	
 	transverse_thrust *= cos(angular_position * pi_over_180);
-	force = Vec2(transverse_thrust, axial_thrust).rotate(sweep_plane_angle);
+	force = Vec2(transverse_thrust, axial_thrust).rotate(sweep_plane_angle * pi_over_180);
 	
-	sum_impulse += axial_thrust * dt;
-	sum_energy += torque * angular_vel * dt;
-	avg_thrust = getAvgThrust();
-	specific_thrust = avg_thrust / getAvgPower();
+	power = torque * angular_vel;
+	specific_thrust = axial_thrust / power;
 	
 	if(torque > peak_torque)
 		peak_torque = torque;
@@ -150,19 +149,6 @@ void Blade::update(Vec2 airflow, double air_dens, double dt, bool print_elems)
 		peak_transverse_moment = transverse_moment;
 }
 
-double Blade::getAvgThrust()
-{
-	if(t == 0)
-		return 0;
-	return sum_impulse / t;
-}
-
-double Blade::getAvgPower()
-{
-	if(t == 0)
-		return 0;
-	return -sum_energy / t;
-}
 
 void Blade::printDebug()
 {
@@ -193,8 +179,6 @@ void Blade::printInfo(bool verbose)
 	"\n  chord root:\t" << chord_root << 
 	"\n  chord tip:\t" << chord_tip << 
 	"\n  mass:\t" << mass <<
-	"\n  avg thrust:\t" << getAvgThrust() <<
-	"\n  avg Power:\t" << getAvgPower() <<
 	"\n  spec thrust:\t" << specific_thrust << "N/w, " << specific_thrust * (1000 / 9.8) << "g/w, " << specific_thrust * (746 / 4.448) << "lbs/hp";
 	
 	if(verbose)

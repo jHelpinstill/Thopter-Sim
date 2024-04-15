@@ -8,17 +8,17 @@ class SweptRegion
 {
 public:
 	SweptRegion() :
-		wash(0),
-		sum_impulse(0),
+		wash(),
+		sum_impulse(),
 		area(0)
 	{}
 	
-	double wash;
-	double sum_impulse;
+	Vec2 wash;
+	Vec2 sum_impulse;
 	double area;
 	Vec2 getDiskVel(double t, double air_dens);
-	void addThrust(double thrust, double dt);
-	double getAvgThrust(double t);
+	void addThrust(Vec2 thrust, double dt);
+	Vec2 getAvgThrust(double t);
 };
 
 #endif

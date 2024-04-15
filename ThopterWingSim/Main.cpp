@@ -239,10 +239,11 @@ int main()
 	
 	PlotGenerator plotter;
 	plotter.attachBlade(&blade);
-	plotter.setIndepVar(&blade.collective, "collective");
-//	plotter.addDepVar(&blade.t, "time");
+	plotter.setIndepVar(&blade.sweep_plane_angle, "angle");
 	plotter.addDepVar(&blade.axial_thrust, "axial thrust", 1.0, true);
 	plotter.addDepVar(&blade.transverse_thrust, "transverse thrust", 1.0, true);
+	plotter.addDepVar(&blade.force.x, "force x", 1.0, true);
+	plotter.addDepVar(&blade.force.y, "force y", 1.0, true);
 	
 	plotter.run(0, 90, 1);
 //	plotter.sim_num_periods = 5;

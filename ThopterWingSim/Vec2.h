@@ -16,6 +16,7 @@ struct Vec2
 	Vec2 operator-(Vec2 u) { return Vec2(x - u.x, y - u.y);}
 	Vec2 operator*(double a) { return Vec2(x * a, y * a);}
 	Vec2 operator/(double a) { if(a == 0) return Vec2(0, 0); return Vec2(x / a, y / a);}
+	Vec2 operator+=(Vec2 u) { x += u.x; y += u.y;}
 	Vec2 unit() { return *this / mag();}
 	double mag() { return sqrt(x * x + y * y);}
 	double dot(Vec2 u) { return x * u.x + y * u.y; }
