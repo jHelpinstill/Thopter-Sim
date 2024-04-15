@@ -14,7 +14,10 @@ void PlotGenerator::runSim()
 	{
 		blade->update(1.225, dt);
 		for(auto& v : dep_vars)
-			if(v.average) v.recordAvg(dt, blade->t);
+		{
+			int skipped_iters = v.T_to_skip * iters_per_period;
+			if(v.average && (i >= skipped_iters)) v.recordAvg(dt);
+		}
 	}
 }
 void PlotGenerator::runRealTime(double periods_to_skip_over, int sampling_freq)
@@ -34,7 +37,7 @@ void PlotGenerator::runRealTime(double periods_to_skip_over, int sampling_freq)
 	{
 		blade->update(1.225, dt);
 		for(auto& v : dep_vars)
-			if(v.average) v.recordAvg(dt, blade->t);
+			if(v.average && (i >= v.T_to_skip * iters_per_period)) v.recordAvg(dt);
 		if(i >= skipped_iters)
 			if(!((i - skipped_iters) % sampling_freq))
 				results.push_back(ResultDatum(dummy_indep, dep_vars));
@@ -78,13 +81,13 @@ void PlotGenerator::setIndepVar(double* param, std::string name)
 {
 	indep_var = Variable(param, name);
 }
-void PlotGenerator::addDepVar(double* param, std::string name, double output_scale, bool average)
+void PlotGenerator::addDepVar(double* param, std::string name, double output_scale, bool average, int T_to_skip)
 {
-	dep_vars.push_back(Variable(param, name, output_scale, average));
+	dep_vars.push_back(Variable(param, name, output_scale, average, T_to_skip));
 }
-void PlotGenerator::addDepVar(double* param, double* param2, std::string name, double output_scale, bool average, bool post_divide)
+void PlotGenerator::addDepVar(double* param, double* param2, std::string name, double output_scale, bool average, bool post_divide, int T_to_skip)
 {
-	dep_vars.push_back(Variable(param, param2, name, output_scale, average, post_divide));
+	dep_vars.push_back(Variable(param, param2, name, output_scale, average, post_divide, T_to_skip));
 }
 void PlotGenerator::printResultsCSV()
 {

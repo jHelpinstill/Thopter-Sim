@@ -10,19 +10,23 @@ struct Variable
 {
 	std::string name;
 	Variable() : output_scale(1) {}
+	// independent varible with bounds
 	Variable(double* param, double lower, double upper, std::string name = "") : 
 		param(param), lower(lower), upper(upper), name(name), at_bounds(false), bounds_active(true), output_scale(1), ratio(false), average(false) {}
 		
-	Variable(double* param, std::string name = "", double output_scale = 1, bool average = false) : 
-		param(param), name(name), bounds_active(false), sum(0), output_scale(output_scale), average(average), ratio(false), post_divide(false) {}
-	
-	Variable(double* param, double* param2, std::string name = "", double output_scale = 1, bool average = false, bool post_divide = false) : 
-		param(param), param2(param2), name(name), bounds_active(false), sum(0), sum2(0), output_scale(output_scale), average(average), ratio(true), post_divide(post_divide) {}
+	// dependent variable, can be instantaneous or average, for avg initial periods can be skipped over to allow for settling
+	Variable(double* param, std::string name = "", double output_scale = 1, bool average = false, int T_to_skip = 0) : 
+		param(param), name(name), bounds_active(false), sum(0), t(0), output_scale(output_scale), average(average), ratio(false), post_divide(false), T_to_skip(T_to_skip) {}
+		
+	// ratio of dependent variables, division can be done on either the instantaneous or averaged values
+	Variable(double* param, double* param2, std::string name = "", double output_scale = 1, bool average = false, bool post_divide = false, int T_to_skip = 0) : 
+		param(param), param2(param2), name(name), bounds_active(false), sum(0), sum2(0), t(0), output_scale(output_scale), average(average), ratio(true), post_divide(post_divide), T_to_skip(T_to_skip) {}
 		
 	double* param;
 	double* param2;
 	
 	bool average;
+	int T_to_skip;
 	bool ratio;
 	bool post_divide;
 	double sum;
@@ -59,7 +63,7 @@ struct Variable
 		if(bounds_active) setValue(*param + (upper - lower) * step);
 		else setValue(*param + step);
 	}
-	void recordAvg(double dt, double t)
+	void recordAvg(double dt)
 	{
 		if(ratio)
 		{
@@ -75,7 +79,7 @@ struct Variable
 		{
 			sum += *param * dt;
 		}
-		this->t = t;
+		t += dt;
 	}
 	double getValue()
 	{
@@ -233,8 +237,8 @@ public:
 	
 	void attachBlade(Blade* blade);
 	void setIndepVar(double* param, std::string name = "var");
-	void addDepVar(double* param, std::string name = "var", double output_scale = 1, bool average = false);
-	void addDepVar(double* param, double* param2, std::string name = "var", double output_scale = 1, bool average = false, bool post_divide = false);
+	void addDepVar(double* param, std::string name = "var", double output_scale = 1, bool average = false, int T_to_skip = 0);
+	void addDepVar(double* param, double* param2, std::string name = "var", double output_scale = 1, bool average = false, bool post_divide = false, int T_to_skip = 0);
 	void printResultsCSV();
 };
 

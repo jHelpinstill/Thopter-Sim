@@ -16,7 +16,7 @@ public:
 	Vec2 wash;
 	Vec2 sum_impulse;
 	double area;
-	Vec2 getDiskVel(double t, double air_dens);
+	Vec2 getDiskVel(Vec2 v0, double t, double air_dens);
 	void addThrust(Vec2 thrust, double dt);
 	Vec2 getAvgThrust(double t);
 };

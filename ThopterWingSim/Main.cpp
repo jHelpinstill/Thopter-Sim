@@ -236,17 +236,19 @@ int main()
 	Blade blade(1, 0.1, 0.05, 10.0 / 216.0, &NACA_0012, 20, 22.5);
 	blade.freq = 20;
 	blade.collective = 14;
-	blade.sweep_plane_angle = 0;
-	blade.airflow = Vec2(0, 0);
+	blade.sweep_plane_angle = 90;
+	blade.airflow = Vec2(-50, 0);
 	
 	PlotGenerator plotter;
-	plotter.sim_num_periods = 4;
+	plotter.sim_num_periods = 5;
 	plotter.attachBlade(&blade);
 //	plotter.setIndepVar(&blade.sweep_plane_angle, "angle");
 	plotter.setIndepVar(&blade.collective, "collective");
-	plotter.addDepVar(&blade.axial_thrust, "axial thrust", 1.0, true);
-	plotter.addDepVar(&blade.power, "power", 1.0, true);
-	plotter.addDepVar(&blade.axial_thrust, &blade.power, "specific thrust", (745.8 / 4.448), true, true);
+//	plotter.addDepVar(&blade.t, "time");
+	plotter.addDepVar(&blade.force.x, "thrust", 1.0, true, 1);
+	plotter.addDepVar(&blade.force.y, "lift", 1.0, true, 1);
+	plotter.addDepVar(&blade.power, "power", 1.0, true, 1);
+	plotter.addDepVar(&blade.force.x, &blade.power, "specific thrust", (745.8 / 4.448), true, true, 1);
 //	plotter.addDepVar(&blade.transverse_thrust, "transverse thrust", 1.0, true);
 //	plotter.addDepVar(&blade.force.x, "force x", 1.0, true);
 //	plotter.addDepVar(&blade.force.y, "force y", 1.0, true);
@@ -254,8 +256,8 @@ int main()
 //	plotter.addDepVar(&blade.force_mag, "force mag", 1.0, true);
 	
 	plotter.run(0, 90, 1);
-//	plotter.sim_num_periods = 5;
-//	plotter.runRealTime(4, 1);
+//	plotter.sim_num_periods = 20;
+//	plotter.runRealTime(0, 1);
 	
 //	GradientAscent tester;
 //	
