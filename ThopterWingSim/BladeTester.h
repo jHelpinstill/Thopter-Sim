@@ -13,15 +13,14 @@ struct Variable
 	Variable(double* param, double lower, double upper, std::string name = "") : 
 		param(param), lower(lower), upper(upper), name(name), at_bounds(false), bounds_active(true), output_scale(1) {}
 	Variable(double* param, std::string name = "", double output_scale = 1, bool average = false) : 
-		param(param), name(name), bounds_active(false), sum(0), prev_t(0), output_scale(output_scale), average(average) {}
+		param(param), name(name), bounds_active(false), sum(0), output_scale(output_scale), average(average) {}
 		
 	double* param;
 	
 	bool average;
 	double sum;
-	double output_scale;
-	double prev_t;
 	double t;
+	double output_scale;
 	
 	double lower;
 	double upper;
@@ -45,11 +44,9 @@ struct Variable
 		if(bounds_active) setValue(*param + (upper - lower) * step);
 		else setValue(*param + step);
 	}
-	void recordAvg(double t)
+	void recordAvg(double dt, double t)
 	{
-		double dt = t - prev_t;
 		sum += *param * dt;
-		prev_t = t;
 		this->t = t;
 	}
 	double getValue()
@@ -131,7 +128,7 @@ struct ResultDatum
 	} 
 	void addDep(std::vector<Variable>& vars)
 	{
-		for(auto v : vars)	
+		for(auto& v : vars)	
 			dep_vars.push_back(v.getValue() * v.output_scale);
 	}
 	void addIndep(double var)

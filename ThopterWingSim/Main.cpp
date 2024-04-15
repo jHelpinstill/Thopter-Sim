@@ -230,28 +230,23 @@ void testLoop()
 
 int main()
 {
-//	Airfoil NACA_0012;
-//	NACA_0012.attachData("airfoil_NACA_0012.txt");
-//	
-//	Blade blade(1, 0.1, 0.05, 10.0 / 216.0, &NACA_0012, 20, 22.5);
-//	blade.freq = 20;
-//	blade.collective = 14;
-//	
-//	PlotGenerator plotter;
-//	plotter.attachBlade(&blade);
-//	plotter.setIndepVar(&blade.collective, "collective");
-////	plotter.addDepVar(&blade.t, "time");
-//	plotter.addDepVar(&blade.axial_thrust, "axial thrust", 1.0, true);
-//	plotter.addDepVar(&blade.transverse_thrust, "transverse thrust", 1.0, true);
-////	plotter.dep_output_scale = (746 / 4.448);
-//	plotter.run(0, 90, 1, true);
-////	plotter.sim_num_periods = 5;
-////	plotter.runRealTime(4, 1);
+	Airfoil NACA_0012;
+	NACA_0012.attachData("airfoil_NACA_0012.txt");
 	
-//	blade.collective = 80;
-//	SimulateBlade(&blade, 1, 100, false);
-//	blade.printInfo(true);
+	Blade blade(1, 0.1, 0.05, 10.0 / 216.0, &NACA_0012, 20, 22.5);
+	blade.freq = 20;
+	blade.collective = 14;
 	
+	PlotGenerator plotter;
+	plotter.attachBlade(&blade);
+	plotter.setIndepVar(&blade.collective, "collective");
+//	plotter.addDepVar(&blade.t, "time");
+	plotter.addDepVar(&blade.axial_thrust, "axial thrust", 1.0, true);
+	plotter.addDepVar(&blade.transverse_thrust, "transverse thrust", 1.0, true);
+	
+	plotter.run(0, 90, 1);
+//	plotter.sim_num_periods = 5;
+//	plotter.runRealTime(4, 1);
 	
 //	GradientAscent tester;
 //	
@@ -270,38 +265,38 @@ int main()
 	
 	
 ///// USER INTERFACE CODE /////
-	bool running = true;
-	while(running)
-	{
-		char input;
-		std::cout << "Options: blades (b), tests (t), airfoils (a), quit (q)... ";
-		std::cin >> input;
-		switch(input)
-		{
-			case 'b':
-			{
-				bladeLoop();
-				break;
-			}
-			case 't':
-			{
-				testLoop();
-				break;
-			}
-			case 'a':
-			{
-				airfoilLoop();
-				break;
-			}
-			case 'q':
-			{
-				std::cout << "\n  Quitting...";
-				running = false;
-				break;
-			}
-		}
-		if(running) std::cout << "\n///// Main Menu /////" << std::endl;
-	}
+//	bool running = true;
+//	while(running)
+//	{
+//		char input;
+//		std::cout << "Options: blades (b), tests (t), airfoils (a), quit (q)... ";
+//		std::cin >> input;
+//		switch(input)
+//		{
+//			case 'b':
+//			{
+//				bladeLoop();
+//				break;
+//			}
+//			case 't':
+//			{
+//				testLoop();
+//				break;
+//			}
+//			case 'a':
+//			{
+//				airfoilLoop();
+//				break;
+//			}
+//			case 'q':
+//			{
+//				std::cout << "\n  Quitting...";
+//				running = false;
+//				break;
+//			}
+//		}
+//		if(running) std::cout << "\n///// Main Menu /////" << std::endl;
+//	}
 	
 //	BladeTester tester;
 //	Blade blade(1, 0.1, 0.05, 10.0 / 216, &NACA_0012, 20, 22.5);

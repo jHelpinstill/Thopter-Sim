@@ -4,6 +4,8 @@ void PlotGenerator::runSim()
 {
 	blade->reset();
 	blade->rebuild();
+	for(auto& v : dep_vars)
+		if(v.average) v.sum = 0;
 	
 	double period = 1 / blade->freq;
 	double dt = period / iters_per_period;
@@ -12,13 +14,15 @@ void PlotGenerator::runSim()
 	{
 		blade->update(Vec2(0, 0), 1.225, dt);
 		for(auto& v : dep_vars)
-			if(v.average) v.recordAvg(blade->t);
+			if(v.average) v.recordAvg(dt, blade->t);
 	}
 }
 void PlotGenerator::runRealTime(double periods_to_skip_over, int sampling_freq)
 {
 	blade->reset();
 	blade->rebuild();
+	for(auto& v : dep_vars)
+		if(v.average) v.sum = 0;
 	
 	double period = 1 / blade->freq;
 	double dt = period / iters_per_period;
@@ -30,7 +34,7 @@ void PlotGenerator::runRealTime(double periods_to_skip_over, int sampling_freq)
 	{
 		blade->update(Vec2(0, 0), 1.225, dt);
 		for(auto& v : dep_vars)
-			if(v.average) v.recordAvg(blade->t);
+			if(v.average) v.recordAvg(dt, blade->t);
 		if(i >= skipped_iters)
 			if(!((i - skipped_iters) % sampling_freq))
 				results.push_back(ResultDatum(dummy_indep, dep_vars));
@@ -51,14 +55,6 @@ void PlotGenerator::run(bool verbose)
 		}
 		results.push_back(ResultDatum(indep_var.getValue(), dep_vars));
 		indep_var.adjustValue(incr);
-		for(auto& v : dep_vars)
-		{
-			if(v.average)
-			{
-				v.prev_t = 0;
-				v.sum = 0;
-			}
-		}
 	}
 	std::cout << "\nFinished! Final results:\n" << std::endl;
 	printResultsCSV();
